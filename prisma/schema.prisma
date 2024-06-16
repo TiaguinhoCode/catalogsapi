@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  namer          String
+  email          String
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @default(now())
+  is_autheticado Boolean   @default(false)
+
+  @@map("user")
+}
+
+model Category {
+  id         String     @id @default(uuid())
+  name       String
+  created_at DateTime?  @default(now())
+  updated_at DateTime?  @default(now())
+  Product    Products[]
+
+  @@map("categories")
+}
+
+model Products {
+  id                  String    @id @default(uuid())
+  name                String
+  price               String
+  description         String
+  created_at          DateTime? @default(now())
+  updated_at          DateTime? @default(now())
+  category_id         String
+  active              Boolean   @default(true)
+  promotion           Boolean   @default(false)
+  discount_amount     String?
+  discount_percentage String?
+
+  // relacionamento
+  category       Category         @relation(fields: [category_id], references: [id])
+  BannerProducts BannerProducts[]
+  Items          Items[]
+
+  @@map("products")
+}
+
+model BannerProducts {
+  id         String @id @default(uuid())
+  banner     String
+  product_id String
+
+  // Relacionamento
+  product Products @relation(fields: [product_id], references: [id])
+
+  @@map("banner_products")
+}
+
+model Order {
+  id         String    @id @default(uuid())
+  status_id  Int?
+  draft      Boolean   @default(true)
+  name       String?
+  table      Int
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  // Relacionamento 
+  status Status? @relation(fields: [status_id], references: [id])
+  Items  Items[]
+
+  @@map("Order")
+}
+
+model Status {
+  id     Int     @id @default(autoincrement())
+  status String
+  Order  Order[]
+
+  @@map("status")
+}
+
+model Items {
+  id         String   @id @default(uuid())
+  ammount    Int
+  order_id   String
+  product_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+
+  // Relacionamento 
+  order   Order    @relation(fields: [order_id], references: [id])
+  product Products @relation(fields: [product_id], references: [id])
+
+  @@map("items")
+}
+
+model AdvertisingBanner {
+  id String @id @default(uuid())
+  banner String
+
+  @@map("advertising_banner")
+}
