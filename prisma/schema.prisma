@@ -15,100 +15,96 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(uuid())
-  namer          String
-  email          String
-  created_at     DateTime? @default(now())
-  updated_at     DateTime? @default(now())
-  is_autheticado Boolean   @default(false)
+  id         String    @id @default(uuid())
+  name       String
+  surname    String
+  photo      String?
+  email      String
+  password   String
+  phone      String
+  cep        String
+  role       String
+  is_active  Boolean   @default(true)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
 
   @@map("user")
 }
 
-model Category {
-  id         String     @id @default(uuid())
-  name       String
-  created_at DateTime?  @default(now())
-  updated_at DateTime?  @default(now())
-  Product    Products[]
-
-  @@map("categories")
-}
-
-model Products {
-  id                  String    @id @default(uuid())
-  name                String
-  price               String
-  description         String
-  created_at          DateTime? @default(now())
-  updated_at          DateTime? @default(now())
-  category_id         String
-  active              Boolean   @default(true)
-  promotion           Boolean   @default(false)
-  discount_amount     String?
-  discount_percentage String?
-
-  // relacionamento
-  category       Category         @relation(fields: [category_id], references: [id])
-  BannerProducts BannerProducts[]
-  Items          Items[]
-
-  @@map("products")
-}
-
-model BannerProducts {
-  id         String @id @default(uuid())
-  banner     String
-  product_id String
-
-  // Relacionamento
-  product Products @relation(fields: [product_id], references: [id])
-
-  @@map("banner_products")
-}
-
-model Order {
+model Banner {
   id         String    @id @default(uuid())
-  status_id  Int?
-  draft      Boolean   @default(true)
-  name       String?
-  table      Int
+  image_url  String
+  product_id String
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
 
-  // Relacionamento 
-  status Status? @relation(fields: [status_id], references: [id])
-  Items  Items[]
+  product Product @relation(fields: [product_id], references: [id])
 
-  @@map("Order")
+  @@map("banner")
+}
+
+model Category {
+  id         String    @id @default(uuid())
+  name       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  Product    Product[]
+
+  @@map("category")
+}
+
+model Product {
+  id                  String    @id @default(uuid())
+  name                String
+  description         String?
+  price               Decimal
+  is_active           Boolean   @default(true)
+  promotion           Boolean   @default(false)
+  category_id         String
+  discount_price      Decimal?
+  discount_percentage Decimal?
+  created_at          DateTime? @default(now())
+  updated_at          DateTime? @default(now())
+
+  category Category @relation(fields: [category_id], references: [id])
+  Banner   Banner[]
+  Item     Item[]
+
+  @@map("product")
 }
 
 model Status {
-  id     Int     @id @default(autoincrement())
-  status String
-  Order  Order[]
+  id         String    @id @default(uuid())
+  name       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  Order      Order[]
 
   @@map("status")
 }
 
-model Items {
-  id         String   @id @default(uuid())
-  ammount    Int
-  order_id   String
-  product_id String
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
+model Order {
+  id         String    @id @default(uuid())
+  status_id  String
+  client     String
+  table      Int
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
 
-  // Relacionamento 
-  order   Order    @relation(fields: [order_id], references: [id])
-  product Products @relation(fields: [product_id], references: [id])
+  status Status @relation(fields: [status_id], references: [id])
+  Items  Item[]
 
-  @@map("items")
+  @@map("order")
 }
 
-model AdvertisingBanner {
-  id String @id @default(uuid())
-  banner String
+model Item {
+  id         String @id @default(uuid())
+  order_id   String
+  product_id String
+  quantity   Int
 
-  @@map("advertising_banner")
+  order   Order   @relation(fields: [order_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("item")
 }
