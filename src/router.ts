@@ -185,6 +185,6 @@ router.put("/v1/items", new EditItemsControllers().handle);
 router.delete("/v1/items", new RemoveItemsController().handle);
 
 // Upload
-router.post("/v1/upload", upload.single("file"), new UploadController().handle);
+router.post("/v1/upload", isAdmin, isAuthenticated, upload.single("file"), new UploadController().handle);
 
 export { router };
