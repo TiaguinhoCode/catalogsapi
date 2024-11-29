@@ -41,6 +41,7 @@ import {  UploadController } from "./controllers/upload";
 import { isAuthenticated } from "./middlewares/auth/isAutheticated";
 import { isAdmin } from "./middlewares/auth/isAdmin";
 import { upload } from "./middlewares/auth/upload";
+import { TestController } from "./controllers/test";
 
 // Config
 
@@ -82,11 +83,7 @@ router.post(
 router.get("/v1/status", new ListStatusController().handle);
 
 // Rota de Teste
-router.get("/v1/test", (req: Request, res: Response) => {
-  res.status(201).json({
-    servidor: "hello word!",
-  });
-});
+router.get("/v1/test", new TestController().handle);
 
 // Rota de Categoria
 router.post(
