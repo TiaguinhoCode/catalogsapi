@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "ts-node-dev src/server.ts",
-    "vercel-build": "npx prisma migrate dev --schema=prisma/empresaX/schema.prisma && npx prisma migrate dev --schema=prisma/empresaY/schema.prisma && npx prisma migrate deploy"
+    "vercel-build": "npx prisma migrate dev --schema=prisma/empresaX/schema.prisma && npx prisma migrate dev --schema=prisma/empresaY/schema.prisma && npx prisma generate --schema=prisma/empresaX/schema.prisma && npx prisma generate --schema=prisma/empresaY/schema.prisma && npx prisma migrate deploy --schema=prisma/empresaX/schema.prisma && npx prisma migrate deploy --schema=prisma/empresaY/schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^5.21.1",
