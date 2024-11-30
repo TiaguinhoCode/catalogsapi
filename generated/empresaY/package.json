@@ -93,5 +93,8 @@
     "./*": "./*"
   },
   "version": "5.21.1",
-  "sideEffects": false
+  "sideEffects": false,
+  "dependencies": {
+    "prisma-client-69e9792d8d278e369b92ce002fb6b0bfd30d701342d4e73a7d2b2ef42f1ddffe": "file:"
+  }
 }
