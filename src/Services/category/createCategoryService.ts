@@ -1,13 +1,16 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface CreateCategoryServiceProps {
   name: string;
+  company: string;
 }
 
 class CreateCategoryService {
-  async execute({ name }: CreateCategoryServiceProps) {
+  async execute({ name, company }: CreateCategoryServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const categoryAlreadyExists = await prismaClient.category.findFirst({
       where: {
         name: name,

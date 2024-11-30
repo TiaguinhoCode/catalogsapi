@@ -1,14 +1,17 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface CrateBannerServiceProps {
   imageUrl: string;
   productId: string;
+  company: string;
 }
 
 class CreateBannerService {
-  async execute({ imageUrl, productId }: CrateBannerServiceProps) {
+  async execute({ imageUrl, productId, company }: CrateBannerServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const banner = await prismaClient.banner.create({
       data: {
         image_url: imageUrl,

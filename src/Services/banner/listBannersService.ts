@@ -1,8 +1,10 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 class ListBannerService {
-  async execute() {
+  async execute(company: string) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const banner = await prismaClient.banner.findMany({
       select: {
         id: true,

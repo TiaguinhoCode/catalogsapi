@@ -7,6 +7,7 @@ import { EditItemsService } from "../../Services/items/editItemsService";
 class EditItemsControllers {
   async handle(req: Request, res: Response) {
     const id = req.query.id as string;
+    const company = (req.query.company as string) || "nenhum";
 
     const { productId, quantity } = req.body;
 
@@ -17,6 +18,7 @@ class EditItemsControllers {
         id,
         productId,
         quantity,
+        company,
       });
 
       return res.json({ message: "success", items: editItems });

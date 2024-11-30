@@ -7,6 +7,8 @@ import { EditUserService } from "../../Services/user/editUserService";
 class EditUserController {
   async handle(req: Request, res: Response) {
     const id = req.query.id as string;
+    const company = (req.query.company as string) || "nenhum";
+
     const { cep, email, is_active, name, phone, photo, role, surname } =
       req.body;
 
@@ -23,6 +25,7 @@ class EditUserController {
         photo,
         role,
         surname,
+        company,
       });
 
       return res.json({ message: "success", user: editUser });

@@ -1,15 +1,18 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tiapgem
 interface EditBannerServiceProps {
   id: string;
   imageUrl?: string;
   productId?: string;
+  company: string;
 }
 
 class EditBannerService {
-  async execute({ id, imageUrl, productId }: EditBannerServiceProps) {
+  async execute({ id, imageUrl, productId, company }: EditBannerServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const banner = await prismaClient.banner.findUnique({
       where: { id },
     });
@@ -30,7 +33,7 @@ class EditBannerService {
       data: {
         image_url: imageUrl,
         product: productId ? { connect: { id: productId } } : undefined,
-        updated_at: new Date()
+        updated_at: new Date(),
       },
     });
 

@@ -1,15 +1,18 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface CreateOrderServiceProps {
   statusId: string;
   client?: string;
   table: number;
+  company: string;
 }
 
 class CreateOrderService {
-  async execute({ client, statusId, table }: CreateOrderServiceProps) {
+  async execute({ client, statusId, table, company }: CreateOrderServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const order = await prismaClient.order.create({
       data: {
         client,

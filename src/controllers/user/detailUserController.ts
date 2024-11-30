@@ -7,10 +7,11 @@ import { DetailUserService } from "../../Services/user/detailUserService";
 class DetailUserController {
   async handle(req: Request, res: Response) {
     const id = req.body;
+    const company = (req.query.company as string) || "nenhum";
 
     const detailUserService = new DetailUserService();
 
-    const user = await detailUserService.execute(id);
+    const user = await detailUserService.execute({ id, company });
 
     return res.json({ message: "ok", user: user });
   }

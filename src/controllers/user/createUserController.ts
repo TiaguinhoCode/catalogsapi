@@ -6,6 +6,7 @@ import { CreateUserService } from "../../Services/user/createUserService";
 
 class CreateUserController {
   async handle(req: Request, res: Response) {
+    const company = (req.query.company as string) || "nenhum";
     const { name, surname, email, password, phone, cep, role } = req.body;
 
     const createUserService = new CreateUserService();
@@ -19,6 +20,7 @@ class CreateUserController {
         phone,
         cep,
         role,
+        company
       });
 
       return res.json({ message: "Successfully created", user: user });

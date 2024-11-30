@@ -1,8 +1,15 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
+
+interface RemoveBannerServiceProps {
+  id: string;
+  company: string;
+}
 
 class RemoveBannerService {
-  async execute(id: string) {
+  async execute({ id, company }: RemoveBannerServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const banner = await prismaClient.banner.findUnique({
       where: {
         id,
@@ -19,7 +26,7 @@ class RemoveBannerService {
       },
     });
 
-    return removeBanner
+    return removeBanner;
   }
 }
 

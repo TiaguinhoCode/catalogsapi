@@ -7,6 +7,7 @@ import { CreateProductService } from "../../Services/products/createProductsServ
 class CreateProductsController {
   async handle(req: Request, res: Response) {
     const { name, description, price, category_id } = req.body;
+    const company = (req.query.company as string) || "nenhum";
 
     const createProductsService = new CreateProductService();
 
@@ -16,6 +17,7 @@ class CreateProductsController {
         description,
         price,
         category_id,
+        company
       });
 
       return res.json({ message: "Successfully", category: products });

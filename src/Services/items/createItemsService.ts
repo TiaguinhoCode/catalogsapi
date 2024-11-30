@@ -1,15 +1,23 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface CreateItemsServiceProps {
   orderId: string;
   productId: string;
   quantity: number;
+  company: string;
 }
 
 class CreateItemsService {
-  async execute({ orderId, productId, quantity }: CreateItemsServiceProps) {
+  async execute({
+    orderId,
+    productId,
+    quantity,
+    company,
+  }: CreateItemsServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const item = await prismaClient.item.create({
       data: {
         order_id: orderId,

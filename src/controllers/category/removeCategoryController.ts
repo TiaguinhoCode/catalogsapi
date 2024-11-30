@@ -7,11 +7,12 @@ import { RemoveCategoryService } from "../../Services/category/removeCategorySer
 class RemoveCategoryController {
   async handle(req: Request, res: Response) {
     const id = req.query.id as string;
+    const company = (req.query.company as string) || "nenhum";
 
     const removeCategoryService = new RemoveCategoryService();
 
     try {
-      const removeCategory = await removeCategoryService.execute(id);
+      const removeCategory = await removeCategoryService.execute({id, company});
 
       return res.json({ message: "success", category: removeCategory });
     } catch (err) {

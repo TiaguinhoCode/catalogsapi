@@ -1,4 +1,5 @@
-import prismaClient from "../../prisma";
+// Client
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface EditProductsServiceProps {
@@ -9,6 +10,7 @@ interface EditProductsServiceProps {
   categoryId?: string; // Novo id da categoria
   price?: number;
   bannerId?: string;
+  company: string;
 }
 
 class EditProductsService {
@@ -20,7 +22,10 @@ class EditProductsService {
     price,
     categoryId,
     bannerId,
+    company,
   }: EditProductsServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const product = await prismaClient.product.findUnique({
       where: { id },
     });

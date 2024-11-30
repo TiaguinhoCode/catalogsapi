@@ -7,6 +7,7 @@ import { EditOrderService } from "../../Services/order/editOrderService";
 class EditOrderController {
   async handle(req: Request, res: Response) {
     const id = req.query.id as string;
+    const company = (req.query.company as string) || "nenhum";
 
     const {client, statusId, table} = req.body;
 
@@ -18,6 +19,7 @@ class EditOrderController {
         client,
         statusId,
         table,
+        company
       });
 
       return res.json({ message: "success", user: editOrders });

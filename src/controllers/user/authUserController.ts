@@ -6,12 +6,13 @@ import { AuthUserService } from "../../Services/user/authUserService";
 
 class AuthUserController {
   async handle(req: Request, res: Response) {
+    const company = (req.query.company as string) || "nenhum";
     const { email, password } = req.body;
 
     try {
       const authUserService = new AuthUserService();
 
-      const auth = await authUserService.execute({ email, password });
+      const auth = await authUserService.execute({ email, password, company });
 
       return res.json({ message: "Authorization success", user: auth.user });
     } catch (err) {

@@ -7,6 +7,7 @@ import { ListProductsPromotionService } from "../../Services/products/listProduc
 class ListProductsPromotionController {
   async handle(req: Request, res: Response) {
     const promotion = req.query.promotion === "true";
+    const company = (req.query.company as string) || "nenhum";
     const isActive = req.query.isActive
       ? req.query.isActive === "true"
       : undefined;
@@ -16,6 +17,7 @@ class ListProductsPromotionController {
     const products = await listProductsPromotionService.execute({
       isActive,
       promotion,
+      company
     });
 
     return res.status(200).json({ products });

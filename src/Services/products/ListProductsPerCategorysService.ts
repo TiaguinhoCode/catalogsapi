@@ -1,14 +1,21 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface ListProductsPerCategorysServiceProps {
   id: string;
   isActive?: boolean;
+  company: string;
 }
 
 class ListProductsPerCategorysService {
-  async execute({ id, isActive }: ListProductsPerCategorysServiceProps) {
+  async execute({
+    id,
+    isActive,
+    company,
+  }: ListProductsPerCategorysServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const products = await prismaClient.product.findMany({
       where: {
         category: {

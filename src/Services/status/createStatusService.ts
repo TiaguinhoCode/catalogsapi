@@ -1,13 +1,16 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface CreateStatusServiceProps {
   name: string;
+  company: string;
 }
 
 class CreateStatusService {
-  async execute({ name }: CreateStatusServiceProps) {
+  async execute({ name, company }: CreateStatusServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const statusAlreadyExists = await prismaClient.status.findFirst({
       where: {
         name: name,

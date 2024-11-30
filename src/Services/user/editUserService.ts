@@ -1,5 +1,5 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface EditUserServiceProps {
@@ -12,6 +12,7 @@ interface EditUserServiceProps {
   photo?: string | null;
   role?: string;
   is_active?: boolean;
+  company: string;
 }
 
 class EditUserService {
@@ -25,7 +26,10 @@ class EditUserService {
     photo,
     role,
     is_active,
+    company,
   }: EditUserServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     // Primeiro, verifica se o usuário existe
     const user = await prismaClient.user.findUnique({
       where: { id },

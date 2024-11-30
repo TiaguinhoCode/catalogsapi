@@ -35,13 +35,12 @@ import { CreateBaannerController } from "./controllers/banner/createBannerContro
 import { ListBannerController } from "./controllers/banner/listBannersController";
 import { EditBannerController } from "./controllers/banner/editBannerController";
 import { RemoveBannerController } from "./controllers/banner/removeBannerController";
-import {  UploadController } from "./controllers/upload";
+import { UploadController } from "./controllers/upload";
 
 // Middlewares
 import { isAuthenticated } from "./middlewares/auth/isAutheticated";
 import { isAdmin } from "./middlewares/auth/isAdmin";
 import { upload } from "./middlewares/auth/upload";
-import { TestController } from "./controllers/test";
 
 // Config
 
@@ -83,7 +82,11 @@ router.post(
 router.get("/v1/status", new ListStatusController().handle);
 
 // Rota de Teste
-router.get("/v1/test", new TestController().handle);
+router.get("/v1/test", (req: Request, res: Response) => {
+  res.status(201).json({
+    servidor: "hello word!",
+  });
+});
 
 // Rota de Categoria
 router.post(
@@ -168,20 +171,26 @@ router.delete(
   new RemoveProductsController().handle
 );
 
-// Order
+// // Order
 router.post("/v1/order", new CreateOrderController().handle);
 router.get("/v1/order", isAuthenticated, new ListOrderController().handle);
 router.get("/v1/order/detail", new DetailOrderController().handle);
 router.put("/v1/order", new EditOrderController().handle);
 router.delete("/v1/order", new RemoveOrderController().handle);
 
-// Item
+// // Item
 router.get("/v1/items", new DetailItemController().handle);
 router.post("/v1/items", new CreateItemsController().handle);
 router.put("/v1/items", new EditItemsControllers().handle);
 router.delete("/v1/items", new RemoveItemsController().handle);
 
 // Upload
-router.post("/v1/upload", isAdmin, isAuthenticated, upload.single("file"), new UploadController().handle);
+router.post(
+  "/v1/upload",
+  isAdmin,
+  isAuthenticated,
+  upload.single("file"),
+  new UploadController().handle
+);
 
 export { router };

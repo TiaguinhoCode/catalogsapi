@@ -1,5 +1,5 @@
 // Cliente
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Biblioteca
 import { hash } from "bcrypt";
@@ -13,6 +13,7 @@ interface userRequest {
   phone: string;
   cep: string;
   role: string;
+  company: string;
 }
 
 class CreateUserService {
@@ -24,7 +25,10 @@ class CreateUserService {
     phone,
     cep,
     role,
+    company,
   }: userRequest) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const userAlreadyExists = await prismaClient.user.findFirst({
       where: {
         email: email,

@@ -1,5 +1,5 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Biblioteca
 import { compare } from "bcrypt";
@@ -9,10 +9,15 @@ import { sign } from "jsonwebtoken";
 interface authRequest {
   email: string;
   password: string;
+  company: string;
 }
 
 class AuthUserService {
-  async execute({ email, password }: authRequest) {
+  async execute({ email, password, company }: authRequest) {
+    
+    // Qual banco de dados?
+    const prismaClient = company === "catalogs" && prismaCatalogs
+    
     const user = await prismaClient.user.findFirst({
       where: {
         email: email,

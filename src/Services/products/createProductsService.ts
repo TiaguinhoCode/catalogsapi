@@ -1,5 +1,5 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface CreateProductsServicePros {
@@ -7,6 +7,7 @@ interface CreateProductsServicePros {
   description: string;
   price: number;
   category_id: string;
+  company: string;
 }
 
 class CreateProductService {
@@ -15,7 +16,10 @@ class CreateProductService {
     description,
     price,
     category_id,
+    company,
   }: CreateProductsServicePros) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const productAlreadyExists = await prismaClient.product.findMany({
       where: {
         name: name,

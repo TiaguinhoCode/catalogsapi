@@ -7,6 +7,7 @@ import { EditProductsService } from "../../Services/products/editProductsService
 class EditProductsContronller {
   async handle(req: Request, res: Response) {
     const id = req.query.id as string;
+    const company = (req.query.company as string) || "nenhum";
     const { bannerId, categoryId, description, isActive, name, price } =
       req.body;
 
@@ -21,6 +22,7 @@ class EditProductsContronller {
         isActive,
         name,
         price,
+        company
       });
 
       return res.json({ message: "success", user: editProduct });

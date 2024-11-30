@@ -7,6 +7,7 @@ import { EditBannerService } from "../../Services/banner/editBannerService";
 class EditBannerController {
   async handle(req: Request, res: Response) {
     const id = req.query.id as string;
+    const company = (req.query.company as string) || "nenhum";
 
     const { imageUrl, productId } = req.body;
 
@@ -17,6 +18,7 @@ class EditBannerController {
         id,
         imageUrl,
         productId,
+        company,
       });
 
       return res.json({ message: "success", banner: editBanner });

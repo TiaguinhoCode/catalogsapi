@@ -1,8 +1,17 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
+
+// Tipagem
+interface DetailUserServiceProps {
+  id: string;
+  company: string;
+}
 
 class DetailUserService {
-  async execute(id: string) {
+  async execute({ id, company }: DetailUserServiceProps) {
+
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const user = await prismaClient.user.findFirst({
       where: {
         id: id,

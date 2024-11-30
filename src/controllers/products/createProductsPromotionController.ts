@@ -7,6 +7,7 @@ import { CreateProductsPromotionService } from "../../Services/products/createPr
 class CreateProductsPromotionController {
   async handle(req: Request, res: Response) {
     try {
+      const company = (req.query.company as string) || "nenhum";
       const { id } = req.query;
 
       const { discountPercentage } = req.body;
@@ -32,6 +33,7 @@ class CreateProductsPromotionController {
       const updatedProduct = await createProductsPromotionService.execute({
         id: id as string,
         discountPercentage: Number(discountPercentage),
+        company
       });
 
       return res.status(200).json({

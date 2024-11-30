@@ -8,7 +8,9 @@ class ListProductsController {
   async handle(req: Request, res: Response) {
     const listProductsService = new ListProductsService();
 
-    const products = await listProductsService.execute();
+    const company = (req.query.company as string) || "nenhum";
+
+    const products = await listProductsService.execute(company);
 
     return res.json({ products: products });
   }

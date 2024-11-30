@@ -1,16 +1,25 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
 
 // Tipagem
 interface EditOrderServiceProps {
   id: string;
   client?: string;
   table?: number;
-  statusId?: string; 
+  statusId?: string;
+  company: string;
 }
 
 class EditOrderService {
-  async execute({ id, client, statusId, table }: EditOrderServiceProps) {
+  async execute({
+    id,
+    client,
+    statusId,
+    table,
+    company,
+  }: EditOrderServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const order = await prismaClient.order.findUnique({
       where: { id },
     });

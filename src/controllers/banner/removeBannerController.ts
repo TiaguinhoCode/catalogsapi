@@ -7,11 +7,12 @@ import { RemoveBannerService } from "../../Services/banner/removeBannerService";
 class RemoveBannerController {
   async handle(req: Request, res: Response) {
     const id = req.query.id as string;
+    const company = (req.query.company as string) || "nenhum";
 
     try {
       const removeBannerService = new RemoveBannerService();
 
-      const removeBanner = await removeBannerService.execute(id);
+      const removeBanner = await removeBannerService.execute({ id, company });
 
       return res.json({ message: "success", banner: removeBanner });
     } catch (err) {

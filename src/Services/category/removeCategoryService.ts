@@ -1,8 +1,16 @@
 // client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
+
+// Tipagem
+interface RemoveCategoryServiceProps {
+  id: string;
+  company: string;
+}
 
 class RemoveCategoryService {
-  async execute(id: string) {
+  async execute({ id, company }: RemoveCategoryServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const category = await prismaClient.category.findUnique({
       where: {
         id,

@@ -7,13 +7,18 @@ import { EditCategoryService } from "../../Services/category/editCategoryService
 class EditCategoryController {
   async handle(req: Request, res: Response) {
     const id = req.query.id as string;
+    const company = (req.query.company as string) || "nenhum";
 
     const { name } = req.body;
 
     const editCategoryService = new EditCategoryService();
 
     try {
-      const editCategory = await editCategoryService.execute({ id, name });
+      const editCategory = await editCategoryService.execute({
+        id,
+        name,
+        company,
+      });
 
       return res.json({ message: "success", category: editCategory });
     } catch (err) {

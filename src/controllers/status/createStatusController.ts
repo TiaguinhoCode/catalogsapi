@@ -7,11 +7,12 @@ import { CreateStatusService } from "../../Services/status/createStatusService";
 class CreateStatusController {
   async handle(req: Request, res: Response) {
     const { name } = req.body;
+    const company = (req.query.company as string) || "nenhum";
 
     const createStatusService = new CreateStatusService();
 
     try {
-      const status = await createStatusService.execute({ name });
+      const status = await createStatusService.execute({ name, company });
 
       return res.json({ message: "Successfully", status: status });
     } catch (err) {

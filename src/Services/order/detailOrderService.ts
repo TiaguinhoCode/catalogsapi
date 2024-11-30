@@ -1,8 +1,16 @@
 // Client
-import prismaClient from "../../prisma";
+import prismaCatalogs from "../../prisma/catalogs";
+
+// Tipagem
+interface DetailOrderServiceProps {
+  company: string;
+  id: string;
+}
 
 class DetailOrderService {
-  async execute(id: string) {
+  async execute({ id, company }: DetailOrderServiceProps) {
+    const prismaClient = company === "catalogs" && prismaCatalogs;
+
     const order = await prismaClient.order.findFirst({
       where: {
         id,
