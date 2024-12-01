@@ -6,7 +6,7 @@ import { DetailUserService } from "../../Services/user/detailUserService";
 
 class DetailUserController {
   async handle(req: Request, res: Response) {
-    const id = req.body;
+    const id = req.user_id;
     const company = (req.query.company as string) || "nenhum";
 
     const detailUserService = new DetailUserService();
