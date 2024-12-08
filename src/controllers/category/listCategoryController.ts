@@ -12,7 +12,7 @@ class ListCategoryController {
 
     const category = await listCategoryService.execute(company);
 
-    return res.json({ category: category });
+    return res.json(category);
   }
 }
 

@@ -10,7 +10,7 @@ class DetailUserController {
     const company = (req.query.company as string) || "nenhum";
 
     const detailUserService = new DetailUserService();
-
+    
     const user = await detailUserService.execute({ id, company });
 
     return res.json({ message: "ok", user: user });
