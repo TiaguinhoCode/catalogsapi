@@ -11,7 +11,7 @@ interface EditCategoryProps {
 class EditCategoryService {
   async execute({ id, name, company }: EditCategoryProps) {
     const prismaClient = company === "catalogs" && prismaCatalogs;
-
+console.log("Empresa: ", company)
     const category = await prismaClient.category.findUnique({
       where: { id },
     });

@@ -8,6 +8,7 @@ interface CreateProductsServicePros {
   price: number;
   category_id: string;
   company: string;
+  costPrice?: number;
 }
 
 class CreateProductService {
@@ -17,6 +18,7 @@ class CreateProductService {
     price,
     category_id,
     company,
+    costPrice,
   }: CreateProductsServicePros) {
     const prismaClient = company === "catalogs" && prismaCatalogs;
 
@@ -32,6 +34,7 @@ class CreateProductService {
         description,
         price,
         category_id,
+        cost_price: costPrice,
       },
       select: {
         id: true,
@@ -39,6 +42,7 @@ class CreateProductService {
         description: true,
         is_active: true,
         price: true,
+        cost_price: true,
         category_id: true,
         category: {
           select: {

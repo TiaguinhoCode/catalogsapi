@@ -11,6 +11,7 @@ interface EditProductsServiceProps {
   price?: number;
   bannerId?: string;
   company: string;
+  costPrice: number;
 }
 
 class EditProductsService {
@@ -23,6 +24,7 @@ class EditProductsService {
     categoryId,
     bannerId,
     company,
+    costPrice,
   }: EditProductsServiceProps) {
     const prismaClient = company === "catalogs" && prismaCatalogs;
 
@@ -46,6 +48,7 @@ class EditProductsService {
               connect: { id: categoryId },
             }
           : undefined,
+        cost_price: costPrice,
         updated_at: new Date(),
       },
     });

@@ -26,6 +26,7 @@ class EditCategoryController {
         if (err.message === "Categoria não encontrado!") {
           return res.status(404).json({ error: err.message });
         } else {
+          console.log("Error: ", err.message)
           return res.status(500).json({ error: "Erro interno do servidor" });
         }
       } else {

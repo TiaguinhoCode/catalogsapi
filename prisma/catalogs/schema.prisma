@@ -53,20 +53,53 @@ model Category {
   @@map("category")
 }
 
+model Supplier {
+  id         String    @id @default(uuid())
+  name       String
+  email      String?
+  phone      String?
+  address    String?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  products Product[]
+
+  @@map("supplier")
+}
+
+model Stock {
+  id             String    @id @default(uuid())
+  product_id     String    @unique
+  quantity       Int       @default(0)
+  minimum_stock  Int       @default(0)
+  max_stock      Int       @default(0)
+  alert_quantity Int       @default(0)
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @default(now())
+
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("stock")
+}
+
 model Product {
   id                  String    @id @default(uuid())
   name                String
   description         String?
   price               Decimal
+  cost_price          Decimal   @default(0.00)
   is_active           Boolean   @default(true)
   promotion           Boolean   @default(false)
   category_id         String
   discount_price      Decimal?
   discount_percentage Decimal?
+  supplier_id         String?
   created_at          DateTime? @default(now())
   updated_at          DateTime? @default(now())
 
-  category Category @relation(fields: [category_id], references: [id])
+  category Category  @relation(fields: [category_id], references: [id])
+  supplier Supplier? @relation(fields: [supplier_id], references: [id])
+  stock    Stock?
   Banner   Banner[]
   Item     Item[]
 
