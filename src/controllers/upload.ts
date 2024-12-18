@@ -2,12 +2,30 @@
 import { Request, Response } from "express";
 
 // Client
-import { supabase } from "../supaBase/client";
+import { createClient } from "@supabase/supabase-js";
 
 class UploadController {
   async handle(req: Request, res: Response): Promise<Response> {
     try {
       const file = req.file;
+      const company = (req.query.company as string) || "nenhum";
+
+      const supabaseUrl =
+        company === "catalogs"
+          ? process.env.SUPABASE_URL_CATALOGS
+          : process.env.SUPABASE_URL_OTHER_COMPANY;
+      const supabaseKey =
+        company === "catalogs"
+          ? process.env.SUPABASE_KEY_CATALOGS
+          : process.env.SUPABASE_KEY_OTHER_COMPANY;
+
+      if (!supabaseUrl || !supabaseKey) {
+        return res
+          .status(500)
+          .json({ error: "Supabase configuration missing" });
+      }
+
+      const supabase = createClient(supabaseUrl, supabaseKey);
 
       if (!file) {
         return res.status(400).json({ error: "No file uploaded" });

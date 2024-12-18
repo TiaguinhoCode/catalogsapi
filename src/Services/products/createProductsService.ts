@@ -7,6 +7,7 @@ interface CreateProductsServicePros {
   description: string;
   price: number;
   category_id: string;
+  image_url: string;
   company: string;
   costPrice?: number;
 }
@@ -17,6 +18,7 @@ class CreateProductService {
     description,
     price,
     category_id,
+    image_url,
     company,
     costPrice,
   }: CreateProductsServicePros) {
@@ -35,6 +37,11 @@ class CreateProductService {
         price,
         category_id,
         cost_price: costPrice,
+        Banner: {
+          create: {
+            image_url: image_url,
+          },
+        },
       },
       select: {
         id: true,
