@@ -10,7 +10,7 @@ class RemoveProductsController {
     const company = (req.query.company as string) || "nenhum";
 
     const removeProductsService = new RemoveProductsService();
-
+    
     const removeProducts = await removeProductsService.execute({ id, company });
 
     return res.json({ message: "success", removeProducts });

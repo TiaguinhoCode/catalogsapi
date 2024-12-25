@@ -24,12 +24,6 @@ class CreateProductService {
   }: CreateProductsServicePros) {
     const prismaClient = company === "catalogs" && prismaCatalogs;
 
-    const productAlreadyExists = await prismaClient.product.findMany({
-      where: {
-        name: name,
-      },
-    });
-
     const product = await prismaClient.product.create({
       data: {
         name,
