@@ -1,4 +1,4 @@
-// Servidor
+// servidor
 import { Request, Response } from "express";
 
 // Service
@@ -9,10 +9,19 @@ class ListProductsController {
     const listProductsService = new ListProductsService();
 
     const company = (req.query.company as string) || "nenhum";
+    const id = req.query.id as string;
+    
+    try {
+      const products = await listProductsService.execute(company, id);
 
-    const products = await listProductsService.execute(company);
+      if (!products) {
+        return res.status(404).json({ error: "Product not found" });
+      }
 
-    return res.json({ products: products });
+      return res.json({ products });
+    } catch (error) {
+      return res.status(500).json({ error: "Internal server error" });
+    }
   }
 }
 

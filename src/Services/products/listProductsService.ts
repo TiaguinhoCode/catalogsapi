@@ -2,8 +2,42 @@
 import prismaCatalogs from "../../prisma/catalogs";
 
 class ListProductsService {
-  async execute(company: string) {
+  async execute(company: string, id?: string) {
     const prismaClient = company === "catalogs" && prismaCatalogs;
+
+    if (!prismaClient) {
+      throw new Error("Invalid company");
+    }
+
+    if (id) {
+      const product = await prismaClient.product.findUnique({
+        where: { id: id },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          is_active: true,
+          category: {
+            select: {
+              name: true,
+            },
+          },
+          price: true,
+          Banner: {
+            select: {
+              image_url: true,
+            },
+          },
+          promotion: true,
+          discount_percentage: true,
+          discount_price: true,
+          created_at: true,
+          updated_at: true,
+        },
+      });
+
+      return product;
+    }
 
     const products = await prismaClient.product.findMany({
       select: {
