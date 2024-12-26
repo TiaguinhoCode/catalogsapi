@@ -19,6 +19,7 @@ class ListProductsService {
           is_active: true,
           category: {
             select: {
+              id: true,
               name: true,
             },
           },
