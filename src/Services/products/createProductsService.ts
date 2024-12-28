@@ -47,11 +47,13 @@ class CreateProductService {
         category_id: true,
         category: {
           select: {
+            id: true,
             name: true,
           },
         },
         Banner: {
           select: {
+            id: true,
             image_url: true,
           },
         },

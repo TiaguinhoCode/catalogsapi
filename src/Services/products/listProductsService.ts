@@ -26,6 +26,7 @@ class ListProductsService {
           price: true,
           Banner: {
             select: {
+              id: true,
               image_url: true,
             },
           },
@@ -48,12 +49,14 @@ class ListProductsService {
         is_active: true,
         category: {
           select: {
+            id: true,
             name: true,
           },
         },
         price: true,
         Banner: {
           select: {
+            id: true,
             image_url: true,
           },
         },

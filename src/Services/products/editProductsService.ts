@@ -7,9 +7,10 @@ interface EditProductsServiceProps {
   name?: string;
   description?: string;
   isActive?: boolean;
-  categoryId?: string; // Novo id da categoria
+  categoryId?: string;
   price?: number;
   bannerId?: string;
+  imagemUrl?: string;
   company: string;
   costPrice: number;
 }
@@ -23,6 +24,7 @@ class EditProductsService {
     price,
     categoryId,
     bannerId,
+    imagemUrl,
     company,
     costPrice,
   }: EditProductsServiceProps) {
@@ -36,6 +38,19 @@ class EditProductsService {
       throw new Error("Produto não encontrado!");
     }
 
+    const banner = await prismaClient.banner.findUnique({
+      where: { id: bannerId },
+    });
+
+    if (!banner) {
+      throw new Error("Banner não encontrado!");
+    }
+
+    const updatedBanner = await prismaClient.banner.update({
+      where: { id: bannerId },
+      data: { image_url: imagemUrl },
+    });
+
     const updateProduct = await prismaClient.product.update({
       where: { id },
       data: {
@@ -43,13 +58,18 @@ class EditProductsService {
         description,
         is_active: isActive,
         price,
+        cost_price: costPrice,
+        updated_at: new Date(),
         category: categoryId
           ? {
               connect: { id: categoryId },
             }
           : undefined,
-        cost_price: costPrice,
-        updated_at: new Date(),
+        Banner: bannerId
+          ? {
+              connect: { id: bannerId },
+            }
+          : undefined,
       },
     });
 

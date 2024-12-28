@@ -8,31 +8,43 @@ class EditProductsContronller {
   async handle(req: Request, res: Response) {
     const id = req.query.id as string;
     const company = (req.query.company as string) || "nenhum";
-    const { bannerId, categoryId, description, isActive, name, price, costPrice } =
-      req.body;
+    const {
+      bannerId,
+      imagemUrl,
+      categoryId,
+      description,
+      isActive,
+      name,
+      price,
+      costPrice,
+    } = req.body;
 
     try {
       const editProductsService = new EditProductsService();
 
       const editProduct = await editProductsService.execute({
         id,
-        bannerId,
-        categoryId,
+        name,
         description,
         isActive,
-        name,
         price,
+        categoryId,
+        bannerId,
+        imagemUrl,
         company,
-        costPrice
+        costPrice,
       });
 
       return res.json({ message: "success", user: editProduct });
     } catch (err) {
       if (err instanceof Error) {
-        if (err.message === "Produto não encontrado!") {
+        if (
+          err.message === "Produto não encontrado!" ||
+          err.message === "Banner não encontrado!"
+        ) {
           return res.status(404).json({ error: err.message });
         } else {
-          console.log("Error: ", err.message)
+          console.log("Error: ", err.message);
           return res.status(500).json({ error: "Erro interno do servidor" });
         }
       } else {
