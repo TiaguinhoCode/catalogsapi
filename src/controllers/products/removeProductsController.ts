@@ -10,10 +10,20 @@ class RemoveProductsController {
     const company = (req.query.company as string) || "nenhum";
 
     const removeProductsService = new RemoveProductsService();
-    
-    const removeProducts = await removeProductsService.execute({ id, company });
 
-    return res.json({ message: "success", removeProducts });
+    try {
+      const removeProducts = await removeProductsService.execute({
+        id,
+        company,
+      });
+
+      return res.json({ message: "success", removeProducts });
+    } catch (err) {
+      console.log(err.message);
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
   }
 }
 

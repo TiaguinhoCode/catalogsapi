@@ -9,14 +9,15 @@ class EditProductsContronller {
     const id = req.query.id as string;
     const company = (req.query.company as string) || "nenhum";
     const {
-      bannerId,
-      imagemUrl,
-      categoryId,
-      description,
-      isActive,
       name,
+      description,
       price,
       costPrice,
+      categoryId,
+      bannerId,
+      imagemUrl,
+      isActive,
+      promotion,
     } = req.body;
 
     try {
@@ -27,6 +28,7 @@ class EditProductsContronller {
         name,
         description,
         isActive,
+        promotion,
         price,
         categoryId,
         bannerId,
@@ -44,7 +46,6 @@ class EditProductsContronller {
         ) {
           return res.status(404).json({ error: err.message });
         } else {
-          console.log("Error: ", err.message);
           return res.status(500).json({ error: "Erro interno do servidor" });
         }
       } else {

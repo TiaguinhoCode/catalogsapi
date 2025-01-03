@@ -171,7 +171,7 @@ router.delete(
   new RemoveProductsController().handle
 );
 
-// // Order
+// Order
 router.post("/v1/order", new CreateOrderController().handle);
 router.get("/v1/order", isAuthenticated, new ListOrderController().handle);
 router.get("/v1/order/detail", new DetailOrderController().handle);
