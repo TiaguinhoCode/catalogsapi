@@ -70,7 +70,12 @@ router.delete(
   isAdmin,
   new UserDeleteController().handle
 );
-router.put("/v1/user", isAuthenticated, new EditUserController().handle);
+router.put(
+  "/v1/user",
+  isAuthenticated,
+  upload.single("file"),
+  new EditUserController().handle
+);
 
 // Rotas de Status
 router.post(

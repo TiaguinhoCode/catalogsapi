@@ -30,16 +30,14 @@ class EditUserService {
   }: EditUserServiceProps) {
     const prismaClient = company === "catalogs" && prismaCatalogs;
 
-    // Primeiro, verifica se o usuário existe
     const user = await prismaClient.user.findUnique({
       where: { id },
     });
 
     if (!user) {
-      throw new Error("Usuário não encontrado!"); // Lança erro se o usuário não existir
+      throw new Error("Usuário não encontrado!");
     }
 
-    // Atualiza o usuário com os dados fornecidos
     const updatedUser = await prismaClient.user.update({
       where: { id },
       data: {
@@ -48,10 +46,10 @@ class EditUserService {
         email,
         cep,
         phone,
-        photo,
+        photo: photo || user.photo, // Atualiza a foto apenas se uma nova for enviada
         role,
         is_active,
-        updated_at: new Date(), // Atualiza o campo updated_at com a data atual
+        updated_at: new Date(),
       },
       select: {
         id: true,
