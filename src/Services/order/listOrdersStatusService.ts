@@ -1,17 +1,27 @@
 // Client
 import prismaCatalogs from "../../prisma/catalogs";
 
-class ListOrderService {
-  async execute(company: string) {
+// Tipagem
+interface ListOrdersStatusServiceProps {
+  statusId: string;
+  company: string;
+}
+
+class ListOrdersStatusService {
+  async execute({ statusId, company }: ListOrdersStatusServiceProps) {
     const prismaClient = company === "catalogs" && prismaCatalogs;
 
     const orders = await prismaClient.order.findMany({
+      where: {
+        status: {
+          id: statusId,
+        },
+      },
       select: {
         id: true,
         client: true,
         status: {
           select: {
-            id: true,
             name: true,
           },
         },
@@ -41,4 +51,4 @@ class ListOrderService {
   }
 }
 
-export { ListOrderService };
+export { ListOrdersStatusService };

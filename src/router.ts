@@ -24,6 +24,7 @@ import { EditProductsContronller } from "./controllers/products/editProductsCont
 import { RemoveProductsController } from "./controllers/products/removeProductsController";
 import { CreateOrderController } from "./controllers/order/createOrderController";
 import { ListOrderController } from "./controllers/order/listOrdersController";
+import { ListOrderStatusController } from "./controllers/order/listOrdersStatusController";
 import { EditOrderController } from "./controllers/order/editOrderController";
 import { RemoveOrderController } from "./controllers/order/removeOrderController";
 import { CreateItemsController } from "./controllers/items/createItemsController";
@@ -179,6 +180,11 @@ router.delete(
 // Order
 router.post("/v1/order", new CreateOrderController().handle);
 router.get("/v1/order", isAuthenticated, new ListOrderController().handle);
+router.get(
+  "/v1/order/status",
+  isAuthenticated,
+  new ListOrderStatusController().handle
+);
 router.get("/v1/order/detail", new DetailOrderController().handle);
 router.put("/v1/order", new EditOrderController().handle);
 router.delete("/v1/order", new RemoveOrderController().handle);
