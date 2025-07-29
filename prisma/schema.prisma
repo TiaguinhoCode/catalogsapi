@@ -13,3 +13,103 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Users {
+  id            String    @id @default(uuid())
+  name          String
+  surname       String
+  phone         String
+  cep           String?
+  photo         String?
+  is_active     Boolean   @default(true)
+  checked       Boolean   @default(false)
+  rule_id       String
+  validation_id String?   @unique @default(uuid())
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @updatedAt
+
+  rule Rules @relation(fields: [rule_id], references: [id])
+
+  @@map("users")
+}
+
+model Rules {
+  id         String    @id @default(uuid())
+  name       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  Users      Users[]
+
+  @@map("rules")
+}
+
+model Companies {
+  id              String    @id @default(uuid())
+  company_fantasy String
+  company_reason  String
+  company_acronym String
+  logo_company    String
+  cnpj            String
+  cep_address     String
+  company_number  String
+  phone           String?
+  is_active       Boolean   @default(true)
+  warehouse_id    String?   @unique
+  opening_hours   DateTime  @db.Time()
+  close_hours     DateTime  @db.Time()
+  created_at      DateTime? @default(now())
+  updated_at      DateTime? @updatedAt
+
+  warehouse Warehouses? @relation(fields: [warehouse_id], references: [id])
+
+  @@map("companies")
+}
+
+model Warehouses {
+  id         String      @id @default(uuid())
+  name       String
+  is_active  Boolean     @default(true)
+  created_at DateTime?   @default(now())
+  updated_at DateTime?   @updatedAt
+  Companies  Companies[]
+  Stocks     Stocks[]
+
+  @@map("warehouses")
+}
+
+model Stocks {
+  warehouse_id        String    @unique
+  current_quantity    Int
+  minimium_quantity   Int
+  maximum_quantity    Int
+  price               Float
+  purchase_price      Float
+  cost_price          Float
+  has_discount        Boolean   @default(false)
+  discount_percentage Float
+  created_at          DateTime? @default(now())
+  updated_at          DateTime? @updatedAt
+
+  warehouse Warehouses @relation(fields: [warehouse_id], references: [id])
+  Products  Products[]
+
+  @@map("stocks")
+}
+
+model Products {
+  id                   String    @id @default(uuid())
+  name                 String
+  stock_id             String
+  product_code         String    @unique
+  description          String?
+  sales_unit           String
+  is_active            Boolean   @default(true)
+  url_imagem           String
+  date_of_inactivation DateTime?
+  created_at           DateTime? @default(now())
+  updated_at           DateTime? @updatedAt
+
+  stock Stocks @relation(fields: [stock_id], references: [warehouse_id])
+
+  @@map("products")
+}
