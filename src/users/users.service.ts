@@ -23,7 +23,7 @@ export class UsersService {
     if (emailExists) {
       throw new BadRequestException('Email já cadastrado');
     }
-
+    console.log('Dados: ', data);
     if (!data.email) {
       throw new BadRequestException('Email não pode estar vazio');
     }
@@ -39,18 +39,21 @@ export class UsersService {
 
     const passawordHash = await hash(data.password, secretKey);
 
-    // const user = await this.client.users.create({
-    //   data: {
-    //     name: data.name,
-    //     surname: data.surname,
-    //     phone: data.phone,
-    //     email: data.email,
-    //     passoword: data.password,
+    const user = await this.client.users.create({
+      data: {
+        name: data.name,
+        surname: data.surname,
+        phone: data.phone,
+        email: data.email,
+        passoword: passawordHash,
+        cep: data.cep,
+        photo: data.photo,
+        rule_id: data.rule_id,
+      },
+      omit: { passoword: true },
+    });
 
-    //   },
-    // });
-
-    return 'This action adds a new user';
+    return user;
   }
 
   findAll() {

@@ -11,6 +11,7 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Telefone não pode estar vazio' })
   phone: string;
 
+  @IsOptional()
   email: string;
 
   @IsOptional()
@@ -26,10 +27,6 @@ export class CreateUserDto {
 
   @IsOptional()
   photo: string;
-
-  is_active: Boolean;
-
-  checked: Boolean;
 
   @IsNotEmpty({ message: 'Regra não pode estar vazio' })
   rule_id: string;
