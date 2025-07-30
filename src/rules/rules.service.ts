@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+// Nest
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
+// Tipagem
 import { CreateRuleDto } from './dto/create-rule.dto';
-import { UpdateRuleDto } from './dto/update-rule.dto';
+
+// Database
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class RulesService {
-  create(createRuleDto: CreateRuleDto) {
-    return 'This action adds a new rule';
+  constructor(private readonly client: PrismaService) {}
+
+  async create(data: CreateRuleDto) {
+    const ruleExists = await this.client.rules.findFirst({
+      where: { name: data.name },
+    });
+
+    if (ruleExists) {
+      throw new BadRequestException('Regra já tá cadastrado');
+    }
+
+    const rule = await this.client.rules.create({
+      data: {
+        name: data.name,
+      },
+    });
+
+    return rule;
   }
 
-  findAll() {
-    return `This action returns all rules`;
+  async findAll() {
+    return await this.client.rules.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} rule`;
-  }
+  async remove(id: string) {
+    const ruleExists = await this.client.rules.findFirst({
+      where: { id },
+    });
 
-  update(id: number, updateRuleDto: UpdateRuleDto) {
-    return `This action updates a #${id} rule`;
-  }
+    if (!ruleExists) {
+      throw new NotFoundException('Regra não encontrada');
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} rule`;
+    const rule = await this.client.rules.delete({ where: { id } });
+
+    return rule;
   }
 }

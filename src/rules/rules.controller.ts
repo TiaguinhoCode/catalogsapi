@@ -1,34 +1,42 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+// Nest
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+
+// Services
 import { RulesService } from './rules.service';
+
+// Tipagem
 import { CreateRuleDto } from './dto/create-rule.dto';
-import { UpdateRuleDto } from './dto/update-rule.dto';
 
 @Controller('rules')
 export class RulesController {
   constructor(private readonly rulesService: RulesService) {}
 
   @Post()
-  create(@Body() createRuleDto: CreateRuleDto) {
-    return this.rulesService.create(createRuleDto);
+  async create(@Body() data: CreateRuleDto) {
+    return {
+      msg: 'Regra criado com sucesso',
+      rule: await this.rulesService.create(data),
+    };
   }
 
   @Get()
-  findAll() {
-    return this.rulesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rulesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRuleDto: UpdateRuleDto) {
-    return this.rulesService.update(+id, updateRuleDto);
+  async findAll() {
+    return { msg: 'ok', rule: await this.rulesService.findAll() };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rulesService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return {
+      msg: 'Regra removido com sucesso!',
+      rule: await this.rulesService.remove(id),
+    };
   }
 }
