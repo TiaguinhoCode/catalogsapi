@@ -1,13 +1,5 @@
 // Nest
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 
 // Services
 import { RulesService } from './rules.service';
