@@ -19,6 +19,8 @@ model Users {
   name          String
   surname       String
   phone         String
+  email         String?
+  passoword     String?
   cep           String?
   photo         String?
   is_active     Boolean   @default(true)
