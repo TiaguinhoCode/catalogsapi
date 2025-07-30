@@ -6,9 +6,10 @@ import { AppController } from './app.controller';
 
 // Modulo
 import { DatabaseModule } from './database/database.module';
+import { RulesModule } from './rules/rules.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, RulesModule],
   controllers: [AppController],
   providers: [],
 })
