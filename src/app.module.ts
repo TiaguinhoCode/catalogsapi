@@ -1,5 +1,5 @@
 // Nest
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 // Controler
 import { AppController } from './app.controller';
@@ -11,10 +11,20 @@ import { DatabaseModule } from './database/database.module';
 import { RulesModule } from './rules/rules.module';
 import { CompaniesModule } from './companies/companies.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './users/auth/auth.module';
+
+// Service
+import { MailService } from './mail/mail.service';
 
 @Module({
-  imports: [UsersModule, DatabaseModule, RulesModule, CompaniesModule],
+  imports: [
+    UsersModule,
+    DatabaseModule,
+    RulesModule,
+    CompaniesModule,
+    forwardRef(() => AuthModule),
+  ],
   controllers: [AppController],
-  providers: [],
+  providers: [MailService],
 })
 export class AppModule {}

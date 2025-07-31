@@ -15,9 +15,16 @@ import { PrismaService } from 'src/database/prisma.service';
 // Bibliotecas
 import { hash } from 'bcrypt';
 
+// Service
+import { MailService } from './../mail/mail.service';
+import { UserMessages } from 'src/utils/common/messages';
+
 @Injectable()
 export class UsersService {
-  constructor(private readonly client: PrismaService) {}
+  constructor(
+    private readonly client: PrismaService,
+    private mailService: MailService,
+  ) {}
 
   async create(data: CreateUserDto) {
     const emailExists = await this.client.users.findFirst({
@@ -58,7 +65,45 @@ export class UsersService {
       omit: { passoword: true },
     });
 
+    const link = `http://localhost:3000/v1/users/verify?token=${user.validation_id}`;
+    await this.mailService.sendEmail(
+      user.email ? user.email : '',
+      UserMessages.EMAIL_CONFIRMATION_SUBJECT,
+      UserMessages.EMAIL_CONFIRMATION_BODY(user.name, user.surname, link),
+    );
+
     return user;
+  }
+
+  async verifyEmail(token: string) {
+    if (!token)
+      throw new BadRequestException('Token é obrigatório para verificação');
+
+    const user = await this.client.users.findUnique({
+      where: { validation_id: token },
+    });
+
+    if (!user) throw new BadRequestException('Token inválido');
+
+    const today = new Date();
+    const createdAt = user.created_at as Date;
+    const hoursPassed =
+      (today.getTime() - createdAt.getTime()) / 1000 / 60 / 60;
+
+    if (hoursPassed > 24) {
+      await this.client.users.delete({ where: { id: user.id } });
+      throw new BadRequestException('Token expirado — cadastro removido');
+    }
+
+    await this.client.users.update({
+      where: { id: user.id },
+      data: {
+        checked: true,
+        validation_id: null,
+      },
+    });
+
+    return { msg: 'E‑mail verificado com sucesso!' };
   }
 
   findAll() {
