@@ -25,6 +25,7 @@ model Users {
   photo         String?
   is_active     Boolean   @default(true)
   checked       Boolean   @default(false)
+  enterprise_id String
   rule_id       String
   validation_id String?   @unique @default(uuid())
   created_at    DateTime? @default(now())
