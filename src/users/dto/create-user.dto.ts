@@ -11,10 +11,13 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Telefone não pode estar vazio' })
   phone: string;
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'Email não pode estar vazio' })
   email: string;
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'Empresa não pode estar vazio' })
+  company_id;
+
+  @IsNotEmpty({ message: 'Senha não pode estar vazio' })
   @MinLength(8, { message: 'Senha deve ter ao menos 8 caracteres' })
   @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\W).+$/, {
     message:

@@ -9,10 +9,10 @@ import { DatabaseModule } from './database/database.module';
 
 // Modulo
 import { RulesModule } from './rules/rules.module';
-import { UsersModule } from './users/users.module';
+import { CompaniesModule } from './companies/companies.module';
 
 @Module({
-  imports: [DatabaseModule, RulesModule, UsersModule],
+  imports: [DatabaseModule, RulesModule, CompaniesModule],
   controllers: [AppController],
   providers: [],
 })

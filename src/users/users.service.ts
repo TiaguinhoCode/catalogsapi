@@ -1,5 +1,9 @@
 // Nest
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 // Tipagem
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,16 +24,16 @@ export class UsersService {
       where: { email: data.email },
     });
 
+    const companyExists = await this.client.companies.findFirst({
+      where: { id: data.company_id },
+    });
+
     if (emailExists) {
       throw new BadRequestException('Email já cadastrado');
     }
-    console.log('Dados: ', data);
-    if (!data.email) {
-      throw new BadRequestException('Email não pode estar vazio');
-    }
 
-    if (!data.password) {
-      throw new BadRequestException('Senha não pode estar vazio');
+    if (!companyExists) {
+      throw new NotFoundException('Empresa não tem cadastrado');
     }
 
     const secretKey = await hash(
@@ -49,6 +53,7 @@ export class UsersService {
         cep: data.cep,
         photo: data.photo,
         rule_id: data.rule_id,
+        enterprise_id: data.company_id,
       },
       omit: { passoword: true },
     });
