@@ -17,7 +17,8 @@ import { hash } from 'bcrypt';
 
 // Service
 import { MailService } from './../mail/mail.service';
-import { UserMessages } from 'src/utils/common/messages';
+// import { UserMessages } from 'src/utils/common/messages';
+import { UserMessages } from '../../src/utils/common/messages/index';
 
 @Injectable()
 export class UsersService {
