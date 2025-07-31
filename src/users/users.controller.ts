@@ -24,9 +24,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 // Middleware
 import { AuthGuard } from './auth/auth.guard';
-import { Rules } from 'src/rules/decorators/rules.decorator';
-import { rules } from 'src/rules/rules.enum';
-import { RulesGuard } from 'src/rules/guards/rules.guard';
+import { Rules } from './../rules/decorators/rules.decorator';
+import { rules } from './../rules/rules.enum';
+import { RulesGuard } from './../rules/guards/rules.guard';
 
 @Controller('users')
 export class UsersController {
