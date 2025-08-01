@@ -11,9 +11,8 @@ async function bootstrap() {
     origin: '*',
     methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS','HEAD'],
     allowedHeaders: ['Content-Type','Authorization','Accept','Origin'],
-    // NÃO use credentials: true com origin '*' pois não é permitido
+    // NÃO use credentials: true com origin '*' pois não é permitido 
   });
-  app.enableCors();
   app.setGlobalPrefix('v1');
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
