@@ -36,8 +36,7 @@ export class RulesController {
   }
 
   @Get()
-  @UseGuards(AuthGuard, RulesGuard)
-  @Rules(rules.SUPORTE)
+  @UseGuards(AuthGuard)
   async findAll() {
     return { msg: 'ok', rule: await this.rulesService.findAll() };
   }
