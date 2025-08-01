@@ -4,13 +4,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   UseGuards,
   Request,
   ForbiddenException,
   Query,
+  Param,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 
 // Service
@@ -73,22 +73,32 @@ export class UsersController {
   @Get()
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.ADMIN, rules.SUPORTE, rules.DONO)
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    return { msg: 'ok', users: await this.usersService.findAll() };
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersService.findOne(+id);
-  // }
+  @Get(':id')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.DONO)
+  async findOne(@Param('id') id: string) {
+    return { msg: 'ok', user: await this.usersService.findOne(id) };
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
+  @Patch(':id')
+  @UseGuards(AuthGuard)
+  async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
+    return {
+      msg: 'Alteração feita com sucesso!',
+      user: await this.usersService.update(id, data),
+    };
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
+  @Delete(':id')
+  @UseGuards(AuthGuard, RulesGuard)
+  async remove(@Param('id') id: string) {
+    return {
+      msg: 'Usuário removido com sucesso!',
+      user: await this.usersService.remove(id),
+    };
+  }
 }
