@@ -7,20 +7,29 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 
 // Services
 import { CompaniesService } from './companies.service';
 
+// Middleware
+import { Rules } from './../rules/decorators/rules.decorator';
+import { rules } from './../rules/rules.enum';
+import { RulesGuard } from './../rules/guards/rules.guard';
+
 // Tipagem
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { AuthGuard } from './../users/auth/auth.guard';
 
 @Controller('companies')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
 
   @Post()
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.DONO, rules.SUPORTE)
   async create(@Body() createCompanyDto: CreateCompanyDto) {
     return {
       msg: 'Empresa criado com sucesso',
