@@ -37,7 +37,7 @@ export class UsersController {
 
   @Post('signup')
   @UseGuards(AuthGuard)
-  @Rules(rules.SUPORTE)
+  @Rules(rules.SUPORTE, rules.DONO)
   async create(@Body() data: CreateUserDto) {
     return {
       msg: 'Usuário criado com sucesso',
