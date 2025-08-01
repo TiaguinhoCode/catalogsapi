@@ -8,7 +8,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 
 // Modulo
-import { MailModule } from 'src/mail/mail.module';
+import { MailModule } from './../mail/mail.module';
 
 @Module({
   imports: [MailModule],
