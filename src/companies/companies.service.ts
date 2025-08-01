@@ -1,5 +1,9 @@
 // Nest
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 // Tipagem
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -41,19 +45,51 @@ export class CompaniesService {
     return enterprise;
   }
 
-  findAll() {
-    return `This action returns all companies`;
+  async findAll() {
+    const companies = await this.client.companies.findMany({
+      include: {
+        warehouse: { select: { name: true } },
+      },
+      omit: { warehouse_id: false },
+    });
+
+    return companies;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  async findOne(id: string) {
+    const enterprise = await this.client.companies.findFirst({
+      where: { id },
+    });
+
+    if (!enterprise) throw new NotFoundException('Empresa não existe');
+
+    return enterprise;
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(id: string, data: UpdateCompanyDto) {
+    const enterpriseExits = await this.client.companies.findFirst({
+      where: { id },
+    });
+
+    if (!enterpriseExits) throw new NotFoundException('Empresa não existe');
+
+    const enterprise = await this.client.companies.update({
+      where: { id },
+      data,
+    });
+
+    return enterprise;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  async remove(id: string) {
+    const enterpriseExits = await this.client.companies.findFirst({
+      where: { id },
+    });
+
+    if (!enterpriseExits) throw new NotFoundException('Empresa não existe');
+
+    const enterprise = await this.client.companies.delete({ where: { id } });
+
+    return enterprise;
   }
 }
