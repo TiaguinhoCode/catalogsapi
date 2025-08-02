@@ -21,9 +21,8 @@ export class CompaniesService {
       where: { cnpj: data.cnpj },
     });
 
-    if (companiesAlreadyExist) {
+    if (companiesAlreadyExist)
       throw new BadRequestException('Empresa já tem cadastrado');
-    }
 
     const enterprise = await this.client.companies.create({
       data: {
@@ -58,6 +57,8 @@ export class CompaniesService {
         warehouse_id: true,
       },
     });
+
+    if (!companies) throw new NotFoundException('Nenhuma empresa cadastrada');
 
     return companies;
   }
@@ -98,7 +99,18 @@ export class CompaniesService {
     return companie;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  async remove(id: string) {
+    const companiesAlreadyExist = await this.client.companies.findFirst({
+      where: { id },
+    });
+
+    if (!companiesAlreadyExist)
+      throw new NotFoundException('Empresa não encontrada');
+
+    const companie = await this.client.companies.delete({
+      where: { id },
+    });
+
+    return companie;
   }
 }

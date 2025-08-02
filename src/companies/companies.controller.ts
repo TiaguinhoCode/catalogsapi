@@ -42,7 +42,7 @@ export class CompaniesController {
   @Rules(rules.DONO, rules.SUPORTE)
   async findAll() {
     return {
-      msg: 'Ok',
+      msg: 'ok',
       enterprise: await this.companiesService.findAll(),
     };
   }
@@ -52,20 +52,28 @@ export class CompaniesController {
   @Rules(rules.DONO, rules.SUPORTE)
   async findOne(@Param('id') id: string) {
     return {
-      msg: 'Ok',
+      msg: 'ok',
       enterprise: await this.companiesService.findOne(id),
     };
   }
 
+  @Patch(':id')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.DONO, rules.SUPORTE)
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() data: UpdateCompanyDto) {
-    return this.companiesService.update(id, data);
+  async update(@Param('id') id: string, @Body() data: UpdateCompanyDto) {
+    return {
+      msg: 'ok',
+      enterprise: await this.companiesService.update(id, data),
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companiesService.remove(+id);
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.DONO, rules.SUPORTE)
+  async remove(@Param('id') id: string) {
+    return {
+      msg: 'Empresa removido com sucesso!',
+      enterprise: await this.companiesService.remove(id),
+    };
   }
 }
