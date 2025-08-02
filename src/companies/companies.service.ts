@@ -1,5 +1,9 @@
 // Nest
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 // Tipagem
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -17,9 +21,8 @@ export class CompaniesService {
       where: { cnpj: data.cnpj },
     });
 
-    if (companiesAlreadyExist) {
+    if (companiesAlreadyExist)
       throw new BadRequestException('Empresa já tem cadastrado');
-    }
 
     const enterprise = await this.client.companies.create({
       data: {
@@ -41,19 +44,73 @@ export class CompaniesService {
     return enterprise;
   }
 
-  findAll() {
-    return `This action returns all companies`;
+  async findAll() {
+    const companies = await this.client.companies.findMany({
+      include: {
+        warehouse: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      omit: {
+        warehouse_id: true,
+      },
+    });
+
+    if (!companies) throw new NotFoundException('Nenhuma empresa cadastrada');
+
+    return companies;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  async findOne(id: string) {
+    const companies = await this.client.companies.findFirst({
+      where: { id },
+      include: {
+        warehouse: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      omit: {
+        warehouse_id: true,
+      },
+    });
+
+    if (!companies) throw new NotFoundException('Empresa não encontrada');
+
+    return companies;
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(id: string, data: UpdateCompanyDto) {
+    const companiesAlreadyExist = await this.client.companies.findFirst({
+      where: { id },
+    });
+
+    if (!companiesAlreadyExist)
+      throw new NotFoundException('Empresa não encontrada');
+
+    const companie = await this.client.companies.update({
+      where: { id },
+      data,
+    });
+
+    return companie;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  async remove(id: string) {
+    const companiesAlreadyExist = await this.client.companies.findFirst({
+      where: { id },
+    });
+
+    if (!companiesAlreadyExist)
+      throw new NotFoundException('Empresa não encontrada');
+
+    const companie = await this.client.companies.delete({
+      where: { id },
+    });
+
+    return companie;
   }
 }
