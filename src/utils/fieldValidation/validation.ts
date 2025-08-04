@@ -1,13 +1,11 @@
 // Nest
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-// Services
+// Client
 import type { PrismaClient } from '@prisma/client';
 
 // Tipagem
-interface EnsureUniqueFieldOptions<
-  M extends keyof Omit<PrismaClient, '$use' | '$disconnect' | '_internal'>,
-> {
+interface EnsureUniqueFieldOptions<M extends keyof PrismaClient> {
   client: PrismaClient;
   model: M;
   field: keyof PrismaClient[M] extends { where: infer W }
@@ -18,31 +16,29 @@ interface EnsureUniqueFieldOptions<
   id?: boolean;
 }
 
-export async function ensureUniqueField<
-  M extends keyof Omit<PrismaClient, '$use' | '$disconnect' | '_internal'>,
->({
-  client,
-  model,
-  field,
-  value,
-  id,
-  msg,
-}: EnsureUniqueFieldOptions<M>): Promise<void> {
-  const where = !id ? { [field]: value, NOT: { id } } : { [field]: value };
+export async function ensureUniqueField<M extends keyof PrismaClient>(
+  options: EnsureUniqueFieldOptions<M>,
+): Promise<unknown> {
+  const { client, model, field, value, msg, id } = options;
+
+  const repo = client[model] as any;
+  const whereClause = id
+    ? { [field]: value }
+    : { [field]: value, NOT: { id: value as string } };
 
   const found = id
-    ? await client[model].findUnique({ where }) // <-- Aqui está o problema
-    : await client[model].findFirst({ where });
+    ? await repo.findUnique({ where: whereClause })
+    : await repo.findFirst({ where: whereClause });
 
-  console.log('dados: ', found);
-
-  if (!id) {
-    if (found) {
-      throw new BadRequestException(msg);
-    }
-  } else {
+  if (id) {
     if (!found) {
       throw new NotFoundException(msg);
     }
+  } else {
+    if (found) {
+      throw new BadRequestException(msg);
+    }
   }
+
+  return found;
 }

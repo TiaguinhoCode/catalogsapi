@@ -12,33 +12,27 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 // Database
 import { PrismaService } from 'src/database/prisma.service';
 
+// Utils
+import { ensureUniqueField } from 'src/utils/fieldValidation/validation';
+import { CompaniesMessages } from './../utils/common/messages/companies.menssages';
+
 @Injectable()
 export class CompaniesService {
   constructor(private readonly client: PrismaService) {}
 
   async create(data: CreateCompanyDto) {
-    const companiesAlreadyExist = await this.client.companies.findFirst({
-      where: { cnpj: data.cnpj },
-    });
-
-    if (companiesAlreadyExist)
-      throw new BadRequestException('Empresa já tem cadastrado');
+    await Promise.all([
+      ensureUniqueField({
+        client: this.client,
+        model: 'companies',
+        field: 'cnpj',
+        value: data.cnpj,
+        msg: CompaniesMessages.COMPANY_ALREADY_HAS_REGISTRATION,
+      }),
+    ]);
 
     const enterprise = await this.client.companies.create({
-      data: {
-        company_fantasy: data.company_fantasy,
-        company_reason: data.company_reason,
-        company_acronym: data.company_acronym,
-        logo_company: data.logo_company,
-        cnpj: data.cnpj,
-        cep_address: data.cep_address,
-        company_number: data.company_number,
-        phone: data.phone,
-        is_active: data.is_active,
-        warehouse_id: data.warehouse_id,
-        opening_hours: data.opening_hours,
-        close_hours: data.close_hours,
-      },
+      data,
     });
 
     return enterprise;
@@ -58,38 +52,35 @@ export class CompaniesService {
       },
     });
 
-    if (!companies) throw new NotFoundException('Nenhuma empresa cadastrada');
+    if (!companies)
+      throw new NotFoundException(CompaniesMessages.COMPANY_NOT_FOUND);
 
     return companies;
   }
 
   async findOne(id: string) {
-    const companies = await this.client.companies.findFirst({
-      where: { id },
-      include: {
-        warehouse: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      omit: {
-        warehouse_id: true,
-      },
+    const companies = await ensureUniqueField({
+      client: this.client,
+      model: 'companies',
+      field: 'id',
+      id: true,
+      value: id,
+      msg: CompaniesMessages.COMPANY_NOT_FOUND,
     });
-
-    if (!companies) throw new NotFoundException('Empresa não encontrada');
 
     return companies;
   }
 
   async update(id: string, data: UpdateCompanyDto) {
-    const companiesAlreadyExist = await this.client.companies.findFirst({
-      where: { id },
-    });
-
-    if (!companiesAlreadyExist)
-      throw new NotFoundException('Empresa não encontrada');
+    await Promise.all([
+      ensureUniqueField({
+        client: this.client,
+        model: 'companies',
+        field: 'id',
+        value: id,
+        msg: CompaniesMessages.COMPANY_NOT_FOUND,
+      }),
+    ]);
 
     const companie = await this.client.companies.update({
       where: { id },
@@ -100,12 +91,15 @@ export class CompaniesService {
   }
 
   async remove(id: string) {
-    const companiesAlreadyExist = await this.client.companies.findFirst({
-      where: { id },
-    });
-
-    if (!companiesAlreadyExist)
-      throw new NotFoundException('Empresa não encontrada');
+    await Promise.all([
+      ensureUniqueField({
+        client: this.client,
+        model: 'companies',
+        field: 'id',
+        value: id,
+        msg: CompaniesMessages.COMPANY_NOT_FOUND,
+      }),
+    ]);
 
     const companie = await this.client.companies.delete({
       where: { id },

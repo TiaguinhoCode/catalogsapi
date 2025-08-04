@@ -1,6 +1,13 @@
 export const UserMessages = {
   EMAIL_ALREADY_REGISTERED: 'Email já tem cadastrado',
   COMPANY_NOT_FOUND: 'Empresa não cadastrada',
+  VERIFIED_EMAIL: 'E‑mail verificado com sucesso!',
+  EXPIRED_TOKEN: 'Token expirado — cadastro removido',
+  TOKEN_VALIDATION: 'Token é obrigatório para verificação',
+  INVALID_TOKEN: 'Token inválido',
+  USER_NOT_FOUND: 'Dados de usuários não encontrados!',
+  CANNOT_DELETE_MASTER_USER: 'Usuário master não pode excluir',
+  LOGIN_SUCCESSFUL: 'Login realizado com sucesso!',
   EMAIL_CONFIRMATION_SUBJECT: '🔒 Confirme seu e‑mail para ativar sua conta',
   EMAIL_CONFIRMATION_BODY: (name: string, surname: string, link: string) =>
     `<p>Olá ${name} ${surname}!</p>
