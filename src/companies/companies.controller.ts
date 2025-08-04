@@ -17,11 +17,14 @@ import { CompaniesService } from './companies.service';
 import { Rules } from './../rules/decorators/rules.decorator';
 import { rules } from './../rules/rules.enum';
 import { RulesGuard } from './../rules/guards/rules.guard';
+import { AuthGuard } from './../users/auth/auth.guard';
+
+// Utils
+import { requestResponseMessages } from './../utils/common/messages/requestResponse.messages';
 
 // Tipagem
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { AuthGuard } from './../users/auth/auth.guard';
 
 @Controller('companies')
 export class CompaniesController {
@@ -32,7 +35,7 @@ export class CompaniesController {
   @Rules(rules.DONO, rules.SUPORTE)
   async create(@Body() createCompanyDto: CreateCompanyDto) {
     return {
-      msg: 'Empresa criado com sucesso',
+      msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Empresa'),
       enterprise: await this.companiesService.create(createCompanyDto),
     };
   }
@@ -42,7 +45,7 @@ export class CompaniesController {
   @Rules(rules.DONO, rules.SUPORTE)
   async findAll() {
     return {
-      msg: 'ok',
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
       enterprise: await this.companiesService.findAll(),
     };
   }
@@ -52,7 +55,7 @@ export class CompaniesController {
   @Rules(rules.DONO, rules.SUPORTE)
   async findOne(@Param('id') id: string) {
     return {
-      msg: 'ok',
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
       enterprise: await this.companiesService.findOne(id),
     };
   }
@@ -62,7 +65,7 @@ export class CompaniesController {
   @Rules(rules.DONO, rules.SUPORTE)
   async update(@Param('id') id: string, @Body() data: UpdateCompanyDto) {
     return {
-      msg: 'ok',
+      msg: requestResponseMessages.CHANGE_REQUEST('Empresa'),
       enterprise: await this.companiesService.update(id, data),
     };
   }
@@ -72,7 +75,7 @@ export class CompaniesController {
   @Rules(rules.DONO, rules.SUPORTE)
   async remove(@Param('id') id: string) {
     return {
-      msg: 'Empresa removido com sucesso!',
+      msg: requestResponseMessages.REMOVAL_REQUEST('Empresa'),
       enterprise: await this.companiesService.remove(id),
     };
   }

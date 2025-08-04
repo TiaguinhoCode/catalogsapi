@@ -13,6 +13,9 @@ import { RULES_KEY } from '../decorators/rules.decorator';
 // Enumerator
 import { rules } from '../rules.enum';
 
+// Utils
+import { requestResponseMessages } from './../../utils/common/messages/requestResponse.messages';
+
 @Injectable()
 export class RulesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
@@ -33,7 +36,9 @@ export class RulesGuard implements CanActivate {
     const hasRule = requiredRules.includes(userRule);
 
     if (!hasRule) {
-      throw new ForbiddenException('Acesso não permitido');
+      throw new ForbiddenException(
+        requestResponseMessages.ACCESS_NOT_PERMITTED,
+      );
     }
 
     return true;
