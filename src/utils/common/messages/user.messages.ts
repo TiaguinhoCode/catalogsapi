@@ -1,5 +1,5 @@
 export const UserMessages = {
-  EMAIL_ALREADY_REGISTERED: 'Email já cadastrado',
+  EMAIL_ALREADY_REGISTERED: 'Email já tem cadastrado',
   COMPANY_NOT_FOUND: 'Empresa não cadastrada',
   EMAIL_CONFIRMATION_SUBJECT: '🔒 Confirme seu e‑mail para ativar sua conta',
   EMAIL_CONFIRMATION_BODY: (name: string, surname: string, link: string) =>

@@ -5,10 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-// Tipagem
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-
 // Dados
 import { PrismaService } from 'src/database/prisma.service';
 
@@ -19,6 +15,13 @@ import { hash } from 'bcrypt';
 import { MailService } from './../mail/mail.service';
 import { UserMessages } from './../utils/common/messages/user.messages';
 
+// Utils
+import { ensureUniqueField } from 'src/utils/fieldValidation/validation';
+
+// Tipagem
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -26,22 +29,37 @@ export class UsersService {
     private mailService: MailService,
   ) {}
 
+  private async ensureCompanyExists(id: string) {
+    const exists = await this.client.companies.findUnique({
+      where: { id: id },
+    });
+
+    if (!exists) throw new NotFoundException('Empresa não existe');
+  }
+
   async create(data: CreateUserDto) {
-    const emailExists = await this.client.users.findFirst({
-      where: { email: data.email },
-    });
+    await Promise.all([
+      ensureUniqueField({
+        client: this.client,
+        model: 'users',
+        field: 'email',
+        value: data.email,
+        msg: UserMessages.EMAIL_ALREADY_REGISTERED,
+      }),
+    ]);
 
-    const companyExists = await this.client.companies.findFirst({
-      where: { id: data.company_id },
-    });
+    await Promise.all([
+      ensureUniqueField({
+        client: this.client,
+        model: 'companies',
+        field: 'id',
+        id: true,
+        value: data.company_id,
+        msg: 'Empresa não tem cadastrado',
+      }),
+    ]);
 
-    if (emailExists) {
-      throw new BadRequestException('Email já cadastrado');
-    }
-
-    if (!companyExists) {
-      throw new NotFoundException('Empresa não tem cadastrado');
-    }
+    // await Promise.all([this.ensureCompanyExists(data.company_id)]);
 
     const secretKey = await hash(
       process.env.HASH_PASSWORD ? process.env.HASH_PASSWORD : '',
@@ -50,29 +68,29 @@ export class UsersService {
 
     const passawordHash = await hash(data.password, secretKey);
 
-    const user = await this.client.users.create({
-      data: {
-        name: data.name,
-        surname: data.surname,
-        phone: data.phone,
-        email: data.email,
-        passoword: passawordHash,
-        cep: data.cep,
-        photo: data.photo,
-        rule_id: data.rule_id,
-        enterprise_id: data.company_id,
-      },
-      omit: { passoword: true },
-    });
+    // const user = await this.client.users.create({
+    //   data: {
+    //     name: data.name,
+    //     surname: data.surname,
+    //     phone: data.phone,
+    //     email: data.email,
+    //     passoword: passawordHash,
+    //     cep: data.cep,
+    //     photo: data.photo,
+    //     rule_id: data.rule_id,
+    //     enterprise_id: data.company_id,
+    //   },
+    //   omit: { passoword: true },
+    // });
 
-    const link = `http://localhost:3000/v1/users/verify?token=${user.validation_id}`;
-    await this.mailService.sendEmail(
-      user.email ? user.email : '',
-      UserMessages.EMAIL_CONFIRMATION_SUBJECT,
-      UserMessages.EMAIL_CONFIRMATION_BODY(user.name, user.surname, link),
-    );
+    // const link = `http://localhost:3000/v1/users/verify?token=${user.validation_id}`;
+    // await this.mailService.sendEmail(
+    //   user.email ? user.email : '',
+    //   UserMessages.EMAIL_CONFIRMATION_SUBJECT,
+    //   UserMessages.EMAIL_CONFIRMATION_BODY(user.name, user.surname, link),
+    // );
 
-    return user;
+    return 'user';
   }
 
   async verifyEmail(token: string) {
