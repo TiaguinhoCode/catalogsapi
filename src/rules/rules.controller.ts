@@ -12,14 +12,17 @@ import {
 // Services
 import { RulesService } from './rules.service';
 
-// Tipagem
-import { CreateRuleDto } from './dto/create-rule.dto';
-
 // Middleware
 import { AuthGuard } from './../users/auth/auth.guard';
 import { Rules } from './../rules/decorators/rules.decorator';
 import { rules } from './../rules/rules.enum';
 import { RulesGuard } from './../rules/guards/rules.guard';
+
+// Utils
+import { requestResponseMessages } from './../utils/common/messages/requestResponse.messages';
+
+// Tipagem
+import { CreateRuleDto } from './dto/create-rule.dto';
 
 @Controller('rules')
 export class RulesController {
@@ -30,7 +33,7 @@ export class RulesController {
   @Rules(rules.SUPORTE)
   async create(@Body() data: CreateRuleDto) {
     return {
-      msg: 'Regra criado com sucesso',
+      msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Regra'),
       rule: await this.rulesService.create(data),
     };
   }
@@ -38,7 +41,10 @@ export class RulesController {
   @Get()
   @UseGuards(AuthGuard)
   async findAll() {
-    return { msg: 'ok', rule: await this.rulesService.findAll() };
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      rule: await this.rulesService.findAll(),
+    };
   }
 
   @Delete(':id')
@@ -46,7 +52,7 @@ export class RulesController {
   @Rules(rules.SUPORTE)
   async remove(@Param('id') id: string) {
     return {
-      msg: 'Regra removido com sucesso!',
+      msg: requestResponseMessages.REMOVAL_REQUEST,
       rule: await this.rulesService.remove(id),
     };
   }

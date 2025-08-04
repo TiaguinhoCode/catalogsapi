@@ -1,28 +1,30 @@
 // Nest
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-
-// Tipagem
-import { CreateRuleDto } from './dto/create-rule.dto';
+import { Injectable } from '@nestjs/common';
 
 // Database
 import { PrismaService } from 'src/database/prisma.service';
+
+// Utils
+import { RulesMessages } from './../utils/common/messages/rules.messages';
+import { ensureUniqueField } from 'src/utils/fieldValidation/validation';
+
+// Tipagem
+import { CreateRuleDto } from './dto/create-rule.dto';
 
 @Injectable()
 export class RulesService {
   constructor(private readonly client: PrismaService) {}
 
   async create(data: CreateRuleDto) {
-    const ruleExists = await this.client.rules.findFirst({
-      where: { name: data.name },
-    });
-
-    if (ruleExists) {
-      throw new BadRequestException('Regra já tá cadastrado');
-    }
+    await Promise.all([
+      ensureUniqueField({
+        client: this.client,
+        model: 'rules',
+        field: 'name',
+        value: data.name,
+        msg: RulesMessages.RULES_ALREADY_REGISTERED,
+      }),
+    ]);
 
     const rule = await this.client.rules.create({
       data: {
@@ -38,13 +40,16 @@ export class RulesService {
   }
 
   async remove(id: string) {
-    const ruleExists = await this.client.rules.findFirst({
-      where: { id },
-    });
-
-    if (!ruleExists) {
-      throw new NotFoundException('Regra não encontrada');
-    }
+    await Promise.all([
+      ensureUniqueField({
+        client: this.client,
+        model: 'rules',
+        field: 'id',
+        id: true,
+        value: id,
+        msg: RulesMessages.RULES_NOT_FOUND,
+      }),
+    ]);
 
     const rule = await this.client.rules.delete({ where: { id } });
 

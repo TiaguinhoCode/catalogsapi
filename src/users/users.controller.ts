@@ -17,16 +17,20 @@ import {
 import { UsersService } from './users.service';
 import { AuthService } from './auth/auth.service';
 
-// Tipagem
-import { CreateUserDto } from './dto/create-user.dto';
-import { AuthDto } from './auth/dto/auth.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-
 // Middleware
 import { AuthGuard } from './auth/auth.guard';
 import { Rules } from './../rules/decorators/rules.decorator';
 import { rules } from './../rules/rules.enum';
 import { RulesGuard } from './../rules/guards/rules.guard';
+
+// Utils
+import { requestResponseMessages } from './../utils/common/messages/requestResponse.messages';
+import { UserMessages } from './../utils/common/messages/user.messages';
+
+// Tipagem
+import { CreateUserDto } from './dto/create-user.dto';
+import { AuthDto } from './auth/dto/auth.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -40,7 +44,7 @@ export class UsersController {
   @Rules(rules.SUPORTE, rules.DONO)
   async create(@Body() data: CreateUserDto) {
     return {
-      msg: 'Usuário criado com sucesso',
+      msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Usuário'),
       user: await this.usersService.create(data),
     };
   }
@@ -53,7 +57,7 @@ export class UsersController {
       throw new ForbiddenException('Usuário não está ativo');
 
     return {
-      msg: 'Login realizado com sucesso',
+      msg: UserMessages.LOGIN_SUCCESSFUL,
       user: user,
       token: access_token,
     };
@@ -67,28 +71,37 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('me')
   getProfile(@Request() req) {
-    return { msg: 'ok', user: req.user };
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      user: req.user,
+    };
   }
 
   @Get()
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.ADMIN, rules.SUPORTE, rules.DONO)
   async findAll() {
-    return { msg: 'ok', users: await this.usersService.findAll() };
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      users: await this.usersService.findAll(),
+    };
   }
 
   @Get(':id')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.DONO)
   async findOne(@Param('id') id: string) {
-    return { msg: 'ok', user: await this.usersService.findOne(id) };
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      user: await this.usersService.findOne(id),
+    };
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard)
   async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
     return {
-      msg: 'Alteração feita com sucesso!',
+      msg: requestResponseMessages.CHANGE_REQUEST('usuário'),
       user: await this.usersService.update(id, data),
     };
   }
@@ -97,7 +110,7 @@ export class UsersController {
   @UseGuards(AuthGuard, RulesGuard)
   async remove(@Param('id') id: string) {
     return {
-      msg: 'Usuário removido com sucesso!',
+      msg: requestResponseMessages.REMOVAL_REQUEST('usuário'),
       user: await this.usersService.remove(id),
     };
   }
