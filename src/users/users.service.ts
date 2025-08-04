@@ -15,13 +15,13 @@ import { hash } from 'bcrypt';
 import { MailService } from './../mail/mail.service';
 
 // Utils
-import { ensureUniqueField } from 'src/utils/fieldValidation/validation';
 import { UserMessages } from './../utils/common/messages/user.messages';
 import { CompaniesMessages } from './../utils/common/messages/companies.menssages';
 
 // Tipagem
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ensureUniqueField } from './../utils/fieldValidation/validation';
 
 @Injectable()
 export class UsersService {

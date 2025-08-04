@@ -14,6 +14,7 @@ import { PrismaService } from 'src/database/prisma.service';
 
 // Tipagem
 import { AuthDto } from './dto/auth.dto';
+import { UserMessages } from './../../utils/common/messages/user.messages';
 
 @Injectable()
 export class AuthService {
@@ -33,18 +34,15 @@ export class AuthService {
       },
     });
 
-    if (!user?.email) {
-      throw new NotFoundException('Usuário não cadastrado');
-    }
+    if (!user?.email) throw new NotFoundException(UserMessages.USER_NOT_FOUND);
 
     const passwordMatch = await compare(
       data.password,
       user.passoword ? user.passoword : '',
     );
 
-    if (!passwordMatch) {
-      throw new UnauthorizedException('Senha incorreta');
-    }
+    if (!passwordMatch)
+      throw new UnauthorizedException(UserMessages.INCORRECT_PASSWORD);
 
     const payload = {
       id: user.id,

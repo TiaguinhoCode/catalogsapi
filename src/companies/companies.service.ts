@@ -13,7 +13,7 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { PrismaService } from 'src/database/prisma.service';
 
 // Utils
-import { ensureUniqueField } from 'src/utils/fieldValidation/validation';
+import { ensureUniqueField } from './../utils/fieldValidation/validation';
 import { CompaniesMessages } from './../utils/common/messages/companies.menssages';
 
 @Injectable()

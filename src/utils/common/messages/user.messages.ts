@@ -9,6 +9,7 @@ export const UserMessages = {
   CANNOT_DELETE_MASTER_USER: 'Usuário master não pode excluir',
   LOGIN_SUCCESSFUL: 'Login realizado com sucesso!',
   EMAIL_CONFIRMATION_SUBJECT: '🔒 Confirme seu e‑mail para ativar sua conta',
+  INCORRECT_PASSWORD: 'Senha incorreta',
   EMAIL_CONFIRMATION_BODY: (name: string, surname: string, link: string) =>
     `<p>Olá ${name} ${surname}!</p>
         <p>Obrigado por criar sua conta na Catloguês. Para ativar seu acesso, basta confirmar seu e‑mail clicando no botão abaixo:</p>
