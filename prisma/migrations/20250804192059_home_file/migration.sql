@@ -12,6 +12,9 @@ CREATE TABLE "public"."users" (
     "validation_id" TEXT,
     "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
+    "email" TEXT,
+    "enterprise_id" TEXT,
+    "passoword" TEXT,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -32,17 +35,17 @@ CREATE TABLE "public"."companies" (
     "company_fantasy" TEXT NOT NULL,
     "company_reason" TEXT NOT NULL,
     "company_acronym" TEXT NOT NULL,
-    "logo_company" TEXT NOT NULL,
+    "logo_company" TEXT,
     "cnpj" TEXT NOT NULL,
     "cep_address" TEXT NOT NULL,
-    "company_number" TEXT NOT NULL,
     "phone" TEXT,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "warehouse_id" TEXT,
-    "opening_hours" TIME NOT NULL,
-    "close_hours" TIME NOT NULL,
+    "opening_hours" TIME(6) NOT NULL,
+    "close_hours" TIME(6) NOT NULL,
     "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
+    "company_number" INTEGER NOT NULL,
 
     CONSTRAINT "companies_pkey" PRIMARY KEY ("id")
 );
@@ -184,6 +187,9 @@ CREATE TABLE "public"."_Method_PaymentsToOrders" (
 CREATE UNIQUE INDEX "users_validation_id_key" ON "public"."users"("validation_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "rules_name_key" ON "public"."rules"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "companies_warehouse_id_key" ON "public"."companies"("warehouse_id");
 
 -- CreateIndex
@@ -205,6 +211,9 @@ CREATE INDEX "_ProductsToSuppliers_B_index" ON "public"."_ProductsToSuppliers"("
 CREATE INDEX "_Method_PaymentsToOrders_B_index" ON "public"."_Method_PaymentsToOrders"("B");
 
 -- AddForeignKey
+ALTER TABLE "public"."users" ADD CONSTRAINT "users_enterprise_id_fkey" FOREIGN KEY ("enterprise_id") REFERENCES "public"."companies"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."users" ADD CONSTRAINT "users_rule_id_fkey" FOREIGN KEY ("rule_id") REFERENCES "public"."rules"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -214,10 +223,10 @@ ALTER TABLE "public"."companies" ADD CONSTRAINT "companies_warehouse_id_fkey" FO
 ALTER TABLE "public"."stocks" ADD CONSTRAINT "stocks_warehouse_id_fkey" FOREIGN KEY ("warehouse_id") REFERENCES "public"."warehouses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."products" ADD CONSTRAINT "products_stock_id_fkey" FOREIGN KEY ("stock_id") REFERENCES "public"."stocks"("warehouse_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."products" ADD CONSTRAINT "products_brand_id_fkey" FOREIGN KEY ("brand_id") REFERENCES "public"."brands"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."products" ADD CONSTRAINT "products_brand_id_fkey" FOREIGN KEY ("brand_id") REFERENCES "public"."brands"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."products" ADD CONSTRAINT "products_stock_id_fkey" FOREIGN KEY ("stock_id") REFERENCES "public"."stocks"("warehouse_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."orders" ADD CONSTRAINT "orders_status_id_fkey" FOREIGN KEY ("status_id") REFERENCES "public"."status"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -9,31 +9,30 @@ datasource db {
 }
 
 model Users {
-  id            String    @id @default(uuid())
+  id            String     @id @default(uuid())
   name          String
   surname       String
   phone         String
-  email         String?
-  passoword     String?
   cep           String?
   photo         String?
-  is_active     Boolean   @default(true)
-  checked       Boolean   @default(false)
-  enterprise_id String?
+  is_active     Boolean    @default(true)
+  checked       Boolean    @default(false)
   rule_id       String
-  validation_id String?   @unique @default(uuid())
-  created_at    DateTime? @default(now())
-  updated_at    DateTime? @updatedAt
-
-  enterprise Companies? @relation(fields: [enterprise_id], references: [id])
-  rule       Rules      @relation(fields: [rule_id], references: [id])
+  validation_id String?    @unique @default(uuid())
+  created_at    DateTime?  @default(now())
+  updated_at    DateTime?  @updatedAt
+  email         String?
+  enterprise_id String?
+  passoword     String?
+  enterprise    Companies? @relation(fields: [enterprise_id], references: [id])
+  rule          Rules      @relation(fields: [rule_id], references: [id])
 
   @@map("users")
 }
 
 model Rules {
   id         String    @id @default(uuid())
-  name       String
+  name       String    @unique
   created_at DateTime? @default(now())
   updated_at DateTime? @updatedAt
   Users      Users[]
@@ -42,24 +41,23 @@ model Rules {
 }
 
 model Companies {
-  id              String    @id @default(uuid())
+  id              String      @id @default(uuid())
   company_fantasy String
   company_reason  String
   company_acronym String
   logo_company    String?
   cnpj            String
   cep_address     String
-  company_number  Int
   phone           String?
-  is_active       Boolean   @default(true)
-  warehouse_id    String?   @unique
-  opening_hours   DateTime  @db.Time(6)
-  close_hours     DateTime  @db.Time(6)
-  created_at      DateTime? @default(now())
-  updated_at      DateTime? @updatedAt
-
-  warehouse Warehouses? @relation(fields: [warehouse_id], references: [id])
-  Users     Users[]
+  is_active       Boolean     @default(true)
+  warehouse_id    String?     @unique
+  opening_hours   DateTime    @db.Time(6)
+  close_hours     DateTime    @db.Time(6)
+  created_at      DateTime?   @default(now())
+  updated_at      DateTime?   @updatedAt
+  company_number  Int
+  warehouse       Warehouses? @relation(fields: [warehouse_id], references: [id])
+  Users           Users[]
 
   @@map("companies")
 }
