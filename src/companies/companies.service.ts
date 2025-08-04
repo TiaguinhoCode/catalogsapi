@@ -21,9 +21,8 @@ export class CompaniesService {
       where: { cnpj: data.cnpj },
     });
 
-    if (companiesAlreadyExist) {
+    if (companiesAlreadyExist)
       throw new BadRequestException('Empresa já tem cadastrado');
-    }
 
     const enterprise = await this.client.companies.create({
       data: {
@@ -48,48 +47,70 @@ export class CompaniesService {
   async findAll() {
     const companies = await this.client.companies.findMany({
       include: {
-        warehouse: { select: { name: true } },
+        warehouse: {
+          select: {
+            name: true,
+          },
+        },
       },
-      omit: { warehouse_id: false },
+      omit: {
+        warehouse_id: true,
+      },
     });
+
+    if (!companies) throw new NotFoundException('Nenhuma empresa cadastrada');
 
     return companies;
   }
 
   async findOne(id: string) {
-    const enterprise = await this.client.companies.findFirst({
+    const companies = await this.client.companies.findFirst({
       where: { id },
+      include: {
+        warehouse: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      omit: {
+        warehouse_id: true,
+      },
     });
 
-    if (!enterprise) throw new NotFoundException('Empresa não existe');
+    if (!companies) throw new NotFoundException('Empresa não encontrada');
 
-    return enterprise;
+    return companies;
   }
 
   async update(id: string, data: UpdateCompanyDto) {
-    const enterpriseExits = await this.client.companies.findFirst({
+    const companiesAlreadyExist = await this.client.companies.findFirst({
       where: { id },
     });
 
-    if (!enterpriseExits) throw new NotFoundException('Empresa não existe');
+    if (!companiesAlreadyExist)
+      throw new NotFoundException('Empresa não encontrada');
 
-    const enterprise = await this.client.companies.update({
+    const companie = await this.client.companies.update({
       where: { id },
       data,
     });
 
-    return enterprise;
+    return companie;
   }
 
   async remove(id: string) {
-    const enterpriseExits = await this.client.companies.findFirst({
+    const companiesAlreadyExist = await this.client.companies.findFirst({
       where: { id },
     });
 
-    if (!enterpriseExits) throw new NotFoundException('Empresa não existe');
+    if (!companiesAlreadyExist)
+      throw new NotFoundException('Empresa não encontrada');
 
-    const enterprise = await this.client.companies.delete({ where: { id } });
+    const companie = await this.client.companies.delete({
+      where: { id },
+    });
 
-    return enterprise;
+    return companie;
   }
 }

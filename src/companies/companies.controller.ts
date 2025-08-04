@@ -41,26 +41,29 @@ export class CompaniesController {
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.DONO, rules.SUPORTE)
   async findAll() {
-    return { msg: 'ok', companies: await this.companiesService.findAll() };
+    return {
+      msg: 'ok',
+      enterprise: await this.companiesService.findAll(),
+    };
   }
 
   @Get(':id')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.DONO, rules.SUPORTE)
   async findOne(@Param('id') id: string) {
-    return { msg: 'ok', companie: await this.companiesService.findOne(id) };
+    return {
+      msg: 'ok',
+      enterprise: await this.companiesService.findOne(id),
+    };
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.DONO, rules.SUPORTE)
-  async update(
-    @Param('id') id: string,
-    @Body() updateCompanyDto: UpdateCompanyDto,
-  ) {
+  async update(@Param('id') id: string, @Body() data: UpdateCompanyDto) {
     return {
-      msg: 'Alteração feita com sucesso!',
-      companie: await this.companiesService.update(id, updateCompanyDto),
+      msg: 'ok',
+      enterprise: await this.companiesService.update(id, data),
     };
   }
 
@@ -69,8 +72,8 @@ export class CompaniesController {
   @Rules(rules.DONO, rules.SUPORTE)
   async remove(@Param('id') id: string) {
     return {
-      msg: 'Usuário removido com sucesso!',
-      companie: await this.companiesService.remove(id),
+      msg: 'Empresa removido com sucesso!',
+      enterprise: await this.companiesService.remove(id),
     };
   }
 }
