@@ -14,22 +14,18 @@ interface EnsureUniqueFieldOptions<M extends keyof PrismaClient> {
   value?: unknown;
   msg: string;
   id?: boolean;
-  exclude?: { field: string; value: unknown };
 }
 
 export async function ensureUniqueField<M extends keyof PrismaClient>(
   options: EnsureUniqueFieldOptions<M>,
 ): Promise<unknown> {
-  const { client, model, field, value, msg, id, exclude } = options;
+  const { client, model, field, value, msg, id } = options;
   const repo = client[model] as any;
 
   const notClause: any = id
     ? {}
     : {
         NOT: [{ id: value as string }],
-        ...(exclude
-          ? { AND: [{ NOT: { [exclude.field]: exclude.value } }] }
-          : {}),
       };
 
   const whereClause = { [field]: value, ...notClause };

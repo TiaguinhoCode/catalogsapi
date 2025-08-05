@@ -134,8 +134,8 @@ export class UsersService {
     return users;
   }
 
-  async findOne(id: string) {
-    const user = await ensureUniqueField({
+  async findOne(id: string, rule: string) {
+    await ensureUniqueField({
       client: this.client,
       model: 'users',
       field: 'id',
@@ -144,13 +144,22 @@ export class UsersService {
       msg: UserMessages.USER_NOT_FOUND,
     });
 
-    if (!user) throw new BadRequestException(UserMessages.USER_NOT_FOUND);
+    const where: any = { id };
+
+    if (rule !== 'Suporte do Sistema') {
+      where.NOT = { email: 'tiagorafael019@gmail.com' };
+    }
+
+    const user = await this.client.users.findFirst({
+      where,
+      omit: { passoword: true },
+    });
 
     return user;
   }
 
   async update(id: string, data: UpdateUserDto) {
-    const userExits = await ensureUniqueField({
+    const master = await ensureUniqueField({
       client: this.client,
       model: 'users',
       field: 'id',
@@ -158,9 +167,7 @@ export class UsersService {
       value: id,
       msg: UserMessages.USER_NOT_FOUND,
     });
-
-    if (!userExits) throw new BadRequestException(UserMessages.USER_NOT_FOUND);
-
+    console.log('Dados: ', master);
     const secretKey = await hash(
       process.env.HASH_PASSWORD ? process.env.HASH_PASSWORD : '',
       10,

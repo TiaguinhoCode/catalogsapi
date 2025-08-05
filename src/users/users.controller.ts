@@ -90,10 +90,10 @@ export class UsersController {
   @Get(':id')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.DONO)
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string, @Request() req) {
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      user: await this.usersService.findOne(id),
+      user: await this.usersService.findOne(id, req.user.rule.name),
     };
   }
 
