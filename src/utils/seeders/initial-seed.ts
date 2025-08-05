@@ -1,6 +1,6 @@
 // Bibliotecas
 import { hash } from 'bcrypt';
-import { PrismaClient } from '../generated/prisma';
+import { PrismaClient } from '../../../generated/prisma';
 
 const prisma = new PrismaClient();
 
@@ -10,6 +10,7 @@ const defaultRules = [
   { name: 'Admin' },
   { name: 'Dono' },
   { name: 'Cliente' },
+  { name: 'Financeiro' },
 ];
 
 async function main() {
