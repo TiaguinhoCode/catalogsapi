@@ -20,24 +20,24 @@ export async function ensureUniqueField<M extends keyof PrismaClient>(
   options: EnsureUniqueFieldOptions<M>,
 ): Promise<unknown> {
   const { client, model, field, value, msg, id } = options;
-
   const repo = client[model] as any;
-  const whereClause = id
-    ? { [field]: value }
-    : { [field]: value, NOT: { id: value as string } };
+
+  const notClause: any = id
+    ? {}
+    : {
+        NOT: [{ id: value as string }],
+      };
+
+  const whereClause = { [field]: value, ...notClause };
 
   const found = id
     ? await repo.findUnique({ where: whereClause })
     : await repo.findFirst({ where: whereClause });
 
   if (id) {
-    if (!found) {
-      throw new NotFoundException(msg);
-    }
+    if (!found) throw new NotFoundException(msg);
   } else {
-    if (found) {
-      throw new BadRequestException(msg);
-    }
+    if (found) throw new BadRequestException(msg);
   }
 
   return found;

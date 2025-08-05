@@ -1,6 +1,7 @@
 // Nest
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -22,6 +23,7 @@ import { CompaniesMessages } from './../utils/common/messages/companies.menssage
 // Tipagem
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { requestResponseMessages } from 'src/utils/common/messages/requestResponse.messages';
 
 @Injectable()
 export class UsersService {
@@ -134,8 +136,8 @@ export class UsersService {
     return users;
   }
 
-  async findOne(id: string) {
-    const user = await ensureUniqueField({
+  async findOne(id: string, rule: string) {
+    await ensureUniqueField({
       client: this.client,
       model: 'users',
       field: 'id',
@@ -144,13 +146,22 @@ export class UsersService {
       msg: UserMessages.USER_NOT_FOUND,
     });
 
-    if (!user) throw new BadRequestException(UserMessages.USER_NOT_FOUND);
+    const where: any = { id };
+
+    if (rule !== 'Suporte do Sistema') {
+      where.NOT = { email: 'tiagorafael019@gmail.com' };
+    }
+
+    const user = await this.client.users.findFirst({
+      where,
+      omit: { passoword: true },
+    });
 
     return user;
   }
 
-  async update(id: string, data: UpdateUserDto) {
-    const userExits = await ensureUniqueField({
+  async update(id: string, data: UpdateUserDto, rule: string) {
+    const master = await ensureUniqueField({
       client: this.client,
       model: 'users',
       field: 'id',
@@ -158,8 +169,6 @@ export class UsersService {
       value: id,
       msg: UserMessages.USER_NOT_FOUND,
     });
-
-    if (!userExits) throw new BadRequestException(UserMessages.USER_NOT_FOUND);
 
     const secretKey = await hash(
       process.env.HASH_PASSWORD ? process.env.HASH_PASSWORD : '',
@@ -170,6 +179,14 @@ export class UsersService {
       data.password ? data.password : '',
       secretKey,
     );
+
+    if (
+      rule !== 'Suporte do Sistema' &&
+      (master as any).email === 'tiagorafael019@gmail.com'
+    )
+      throw new ForbiddenException(
+        requestResponseMessages.ACCESS_NOT_PERMITTED,
+      );
 
     const user = await this.client.users.update({
       where: { id },

@@ -90,19 +90,23 @@ export class UsersController {
   @Get(':id')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.DONO)
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string, @Request() req) {
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      user: await this.usersService.findOne(id),
+      user: await this.usersService.findOne(id, req.user.rule.name),
     };
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() data: UpdateUserDto,
+    @Request() req,
+  ) {
     return {
       msg: requestResponseMessages.CHANGE_REQUEST('usuário'),
-      user: await this.usersService.update(id, data),
+      user: await this.usersService.update(id, data, req.user.rule.name),
     };
   }
 
