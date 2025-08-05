@@ -1,6 +1,7 @@
 // Nest
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -22,6 +23,7 @@ import { CompaniesMessages } from './../utils/common/messages/companies.menssage
 // Tipagem
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { requestResponseMessages } from 'src/utils/common/messages/requestResponse.messages';
 
 @Injectable()
 export class UsersService {
@@ -158,7 +160,7 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, data: UpdateUserDto) {
+  async update(id: string, data: UpdateUserDto, rule: string) {
     const master = await ensureUniqueField({
       client: this.client,
       model: 'users',
@@ -167,7 +169,7 @@ export class UsersService {
       value: id,
       msg: UserMessages.USER_NOT_FOUND,
     });
-    console.log('Dados: ', master);
+
     const secretKey = await hash(
       process.env.HASH_PASSWORD ? process.env.HASH_PASSWORD : '',
       10,
@@ -177,6 +179,14 @@ export class UsersService {
       data.password ? data.password : '',
       secretKey,
     );
+
+    if (
+      rule !== 'Suporte do Sistema' &&
+      (master as any).email === 'tiagorafael019@gmail.com'
+    )
+      throw new ForbiddenException(
+        requestResponseMessages.ACCESS_NOT_PERMITTED,
+      );
 
     const user = await this.client.users.update({
       where: { id },

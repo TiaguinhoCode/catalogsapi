@@ -99,10 +99,14 @@ export class UsersController {
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() data: UpdateUserDto,
+    @Request() req,
+  ) {
     return {
       msg: requestResponseMessages.CHANGE_REQUEST('usuário'),
-      user: await this.usersService.update(id, data),
+      user: await this.usersService.update(id, data, req.user.rule.name),
     };
   }
 
