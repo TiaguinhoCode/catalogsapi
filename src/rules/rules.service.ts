@@ -6,7 +6,7 @@ import { PrismaService } from 'src/database/prisma.service';
 
 // Utils
 import { RulesMessages } from './../utils/common/messages/rules.messages';
-import { ensureUniqueField } from 'src/utils/fieldValidation/validation';
+import { ensureUniqueField } from './../utils/fieldValidation/validation';
 
 // Tipagem
 import { CreateRuleDto } from './dto/create-rule.dto';

@@ -16,14 +16,14 @@ import { hash } from 'bcrypt';
 import { MailService } from './../mail/mail.service';
 
 // Utils
-import { ensureUniqueField } from 'src/utils/fieldValidation/validation';
 import { UserMessages } from './../utils/common/messages/user.messages';
 import { CompaniesMessages } from './../utils/common/messages/companies.menssages';
+import { ensureUniqueField } from './../utils/fieldValidation/validation';
+import { requestResponseMessages } from './../utils/common/messages/requestResponse.messages';
 
 // Tipagem
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { requestResponseMessages } from 'src/utils/common/messages/requestResponse.messages';
 
 @Injectable()
 export class UsersService {
@@ -156,6 +156,8 @@ export class UsersService {
       where,
       omit: { passoword: true },
     });
+
+    if (!user) throw new NotFoundException(UserMessages.USER_NOT_FOUND);
 
     return user;
   }
