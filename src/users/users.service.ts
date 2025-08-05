@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 
 // Dados
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from './../database/prisma.service';
 
 // Bibliotecas
 import { hash } from 'bcrypt';
