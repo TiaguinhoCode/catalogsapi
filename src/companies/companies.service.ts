@@ -10,7 +10,7 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 
 // Database
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from './../database/prisma.service';
 
 // Utils
 import { ensureUniqueField } from './../utils/fieldValidation/validation';

@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 
 // Database
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from './../database/prisma.service';
 
 // Utils
 import { RulesMessages } from './../utils/common/messages/rules.messages';
