@@ -6,8 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 
 // Module
-import { UsersModule } from 'src/users/users.module';
-import { DatabaseModule } from 'src/database/database.module';
+import { UsersModule } from './../users.module';
+import { DatabaseModule } from './../../database/database.module';
 
 @Global()
 @Module({

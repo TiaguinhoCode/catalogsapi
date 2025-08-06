@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
 // Database
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from './../../database/prisma.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

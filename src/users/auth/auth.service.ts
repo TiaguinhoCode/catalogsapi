@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 
 // Service
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from './../../database/prisma.service';
 
 // Tipagem
 import { AuthDto } from './dto/auth.dto';
