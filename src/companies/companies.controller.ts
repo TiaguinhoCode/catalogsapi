@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 // Services
@@ -47,6 +48,16 @@ export class CompaniesController {
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
       enterprise: await this.companiesService.findAll(),
+    };
+  }
+
+  @Get('warehouses')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.DONO, rules.SUPORTE)
+  async findCompaniesByWarehouses(@Query('name') name: string) {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      enterprise: await this.companiesService.findCompaniesByWarehouses(name),
     };
   }
 
