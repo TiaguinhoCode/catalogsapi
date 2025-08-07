@@ -25,7 +25,11 @@ export class ProductsService {
       msg: ProductsMessages.PRODUCT_ALREADY_HAS_REGISTRATION,
     });
 
-    const product = await this.client.products.create({ data });
+    const product = await this.client.stocks.create({
+      data: {
+        warehouse_id: data.stock_id,
+      },
+    });
 
     return product;
   }
