@@ -102,7 +102,7 @@ model Products {
   description          String?
   sales_unit           String
   is_active            Boolean   @default(true)
-  url_imagem           String
+  url_imagem           String?
   date_of_inactivation DateTime?
   created_at           DateTime? @default(now())
   updated_at           DateTime? @updatedAt
