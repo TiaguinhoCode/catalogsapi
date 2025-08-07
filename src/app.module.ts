@@ -16,6 +16,7 @@ import { AuthModule } from './users/auth/auth.module';
 // Service
 import { MailService } from './mail/mail.service';
 import { WarehousesModule } from './warehouses/warehouses.module';
+import { BrandsModule } from './brands/brands.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { WarehousesModule } from './warehouses/warehouses.module';
     CompaniesModule,
     forwardRef(() => AuthModule),
     WarehousesModule,
+    BrandsModule,
   ],
   controllers: [AppController],
   providers: [MailService],
