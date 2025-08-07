@@ -93,22 +93,25 @@ model Stocks {
 }
 
 model Products {
-  id                   String        @id @default(uuid())
+  id                   String    @id @default(uuid())
   name                 String
   stock_id             String
+  category_id          String
   brand_id             String
-  product_code         String        @unique
+  product_code         String    @unique
   description          String?
   sales_unit           String
-  is_active            Boolean       @default(true)
+  is_active            Boolean   @default(true)
   url_imagem           String
   date_of_inactivation DateTime?
-  created_at           DateTime?     @default(now())
-  updated_at           DateTime?     @updatedAt
-  items                Orders_Itens?
-  brand                Brands        @relation(fields: [brand_id], references: [id])
-  stock                Stocks        @relation(fields: [stock_id], references: [warehouse_id])
-  supliers             Suppliers[]   @relation("ProductsToSuppliers")
+  created_at           DateTime? @default(now())
+  updated_at           DateTime? @updatedAt
+
+  items    Orders_Itens?
+  brand    Brands        @relation(fields: [brand_id], references: [id])
+  stock    Stocks        @relation(fields: [stock_id], references: [warehouse_id])
+  category Categories    @relation(fields: [category_id], references: [id])
+  supliers Suppliers[]   @relation("ProductsToSuppliers")
 
   @@map("products")
 }
@@ -121,6 +124,16 @@ model Brands {
   Products   Products[]
 
   @@map("brands")
+}
+
+model Categories {
+  id         String     @id @default(uuid())
+  name       String
+  created_at DateTime?  @default(now())
+  updated_at DateTime?  @updatedAt
+  Products   Products[]
+
+  @@map("categories")
 }
 
 model Suppliers {
