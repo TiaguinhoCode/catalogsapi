@@ -41,8 +41,6 @@ export class BrandsController {
   }
 
   @Get()
-  @UseGuards(AuthGuard, RulesGuard)
-  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
   async findAll() {
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
@@ -51,8 +49,6 @@ export class BrandsController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard, RulesGuard)
-  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
   async findOne(@Param('id') id: string) {
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
