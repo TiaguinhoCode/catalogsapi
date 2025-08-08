@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 // Service
@@ -28,28 +29,54 @@ import { requestResponseMessages } from './../utils/common/messages/requestRespo
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @Post()
+  @Post('stocks')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
-  async create(@Body() createProductDto: CreateProductDto) {
+  async create(@Body() data: CreateProductDto) {
     return {
       msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Produto'),
-      product: await this.productsService.create(createProductDto),
+      product: await this.productsService.create(data),
+    };
+  }
+
+  @Get('stocks')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
+  async findAllStock() {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Produto'),
+      products: await this.productsService.findAllStock(),
     };
   }
 
   @Get()
-  @UseGuards(AuthGuard, RulesGuard)
-  @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
-  async findAll() {
-    return this.productsService.findAll();
+  async findAllProducts() {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      products: await this.productsService.findAllProducts(),
+    };
+  }
+
+  @Get('filter')
+  async findAllProductsByFilter(
+    @Query('brands') brandsId?: string,
+    @Query('categories') categoriesId?: string,
+  ) {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      products: await this.productsService.findAllProductsByFilter(
+        brandsId,
+        categoriesId,
+      ),
+    };
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard, RulesGuard)
-  @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
   async findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      product: await this.productsService.findOne(id),
+    };
   }
 
   @Patch(':id')

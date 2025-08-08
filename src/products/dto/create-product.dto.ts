@@ -32,6 +32,27 @@ export class CreateProductDto {
   @IsOptional()
   date_of_inactivation: Date;
 
-  @IsNotEmpty({ message: 'Nome não pode estar vazio' })
+  @IsNotEmpty({ message: 'Quantidade atual não pode estar vazio' })
   current_quantity: number;
+
+  @IsNotEmpty({ message: 'Quantidade mínima não pode estar vazio' })
+  minimium_quantity: number;
+
+  @IsNotEmpty({ message: 'Quantidade máxima não pode estar vazio' })
+  maximum_quantity: number;
+
+  @IsNotEmpty({ message: 'Preço máxima não pode estar vazio' })
+  price: number;
+
+  @IsNotEmpty({ message: 'Preço de compra não pode estar vazio' })
+  purchase_price: number;
+
+  @IsNotEmpty({ message: 'Preço de custo não pode estar vazio' })
+  cost_price: number;
+
+  @IsOptional()
+  discount_percentage: number;
+
+  @IsOptional()
+  has_discount: boolean;
 }

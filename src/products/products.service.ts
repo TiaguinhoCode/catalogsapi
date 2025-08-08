@@ -1,5 +1,5 @@
 // Nest
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 // Service
 import { PrismaService } from './../database/prisma.service';
@@ -7,6 +7,9 @@ import { PrismaService } from './../database/prisma.service';
 // Utils
 import { ensureUniqueField } from './../utils/fieldValidation/validation';
 import { ProductsMessages } from './../utils/common/messages/products.menssages';
+import { WarehousesMessages } from './../utils/common/messages/warehouses.menssages';
+import { BrandsMenssages } from './../utils/common/messages/brands.menssages';
+import { CategoriesMessages } from './../utils/common/messages/categories.menssages';
 
 // Tipagem
 import { CreateProductDto } from './dto/create-product.dto';
@@ -25,21 +28,196 @@ export class ProductsService {
       msg: ProductsMessages.PRODUCT_ALREADY_HAS_REGISTRATION,
     });
 
+    await ensureUniqueField({
+      client: this.client,
+      model: 'warehouses',
+      field: 'id',
+      id: true,
+      value: data.stock_id,
+      msg: WarehousesMessages.WAREHOUSE_NOT_FOUND,
+    });
+
+    await ensureUniqueField({
+      client: this.client,
+      model: 'brands',
+      field: 'id',
+      id: true,
+      value: data.brand_id,
+      msg: BrandsMenssages.BRANDS_NOT_FOUND,
+    });
+
+    await ensureUniqueField({
+      client: this.client,
+      model: 'categories',
+      field: 'id',
+      id: true,
+      value: data.category_id,
+      msg: CategoriesMessages.CATEGORIES_NOT_FOUND,
+    });
+
+    await ensureUniqueField({
+      client: this.client,
+      model: 'products',
+      field: 'product_code',
+      value: data.product_code,
+      msg: ProductsMessages.BARCODE_ALREADY_REGISTERED,
+    });
+
     const product = await this.client.stocks.create({
       data: {
         warehouse_id: data.stock_id,
+        current_quantity: data.current_quantity,
+        minimium_quantity: data.minimium_quantity,
+        maximum_quantity: data.maximum_quantity,
+        price: data.price,
+        purchase_price: data.purchase_price,
+        cost_price: data.cost_price,
+        has_discount: data.has_discount && data.has_discount,
+        discount_percentage: data.has_discount
+          ? data.discount_percentage
+          : null,
+        Products: {
+          create: {
+            name: data.name,
+            category_id: data.category_id,
+            brand_id: data.brand_id,
+            product_code: data.product_code,
+            description: data.description,
+            sales_unit: data.sales_unit,
+            url_imagem: data.url_imagem,
+          },
+        },
+      },
+      select: { Products: true },
+    });
+
+    return product.Products;
+  }
+
+  async findAllProducts() {
+    const products = await this.client.products.findMany({
+      where: { is_active: true },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        brand: { select: { name: true } },
+        category: { select: { name: true } },
+        url_imagem: true,
+        stock: {
+          select: {
+            price: true,
+            current_quantity: true,
+            has_discount: true,
+            discount_percentage: true,
+          },
+        },
       },
     });
 
-    return product;
+    if (!products)
+      throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
+
+    const formatted = products.map((item) => ({
+      id: item.id,
+      url_imagem: item.url_imagem,
+      name: item.name,
+      description: item.description,
+      brand: item.brand?.name ?? null,
+      category: item.category?.name ?? null,
+      price: item.stock?.price ?? null,
+      current_quantity: item.stock?.current_quantity ?? null,
+      has_discount: item.stock?.has_discount ?? null,
+      discount_percentage: item.stock?.discount_percentage ?? null,
+    }));
+
+    return formatted;
   }
 
-  async findAll() {
-    return `This action returns all products`;
+  async findAllProductsByFilter(brandsId?: string, categoriesId?: string) {
+    const where = {
+      is_active: true,
+      ...(brandsId && { brand_id: { in: brandsId.split(',') } }),
+      ...(categoriesId && { category_id: { in: categoriesId.split(',') } }),
+    };
+
+    const products = await this.client.products.findMany({ where });
+
+    if (products.length === 0)
+      throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
+
+    return products;
   }
 
-  async findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findAllStock() {
+    const products = await this.client.products.findMany({
+      select: {
+        id: true,
+        url_imagem: true,
+        name: true,
+        description: true,
+        product_code: true,
+        sales_unit: true,
+        brand: { select: { name: true } },
+        category: {
+          select: { name: true },
+        },
+        is_active: true,
+        date_of_inactivation: true,
+        stock: true,
+      },
+    });
+
+    if (!products)
+      throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
+
+    const formatted = products.map((item) => ({
+      ...item,
+      brand: item.brand?.name ?? null,
+      category: item.category?.name ?? null,
+    }));
+
+    return formatted;
+  }
+
+  async findOne(id: string) {
+    const product = await this.client.products.findUnique({
+      where: { id, AND: { is_active: true } },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        brand: { select: { name: true } },
+        category: { select: { name: true } },
+        url_imagem: true,
+        stock: {
+          select: {
+            price: true,
+            current_quantity: true,
+            has_discount: true,
+            discount_percentage: true,
+          },
+        },
+      },
+    });
+
+    if (!product)
+      throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
+
+    const formatted = {
+      id: product.id,
+      url_imagem: product.url_imagem,
+      name: product.name,
+      description: product.description,
+      brand: product.brand?.name ?? null,
+      category: product.category?.name ?? null,
+      price: product.stock?.price ?? null,
+      current_quantity: product.stock?.current_quantity ?? null,
+      has_discount: product.stock?.has_discount ?? null,
+      discount_percentage: product.stock?.discount_percentage ?? null,
+    };
+
+    return formatted;
   }
 
   async update(id: number, data: UpdateProductDto) {
