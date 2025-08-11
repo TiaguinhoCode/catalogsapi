@@ -39,13 +39,41 @@ export class ProductsController {
     };
   }
 
+  @Get('stocks/filters')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
+  async filtersForProductsInStock(
+    @Query('brands') brandsId?: string,
+    @Query('categories') categoriesId?: string,
+    @Query('warehouse') warehouseId?: string,
+  ) {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      products: await this.productsService.filtersForProductsInStock(
+        brandsId,
+        categoriesId,
+        warehouseId,
+      ),
+    };
+  }
+
   @Get('stocks')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
   async findAllStock() {
     return {
-      msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Produto'),
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
       products: await this.productsService.findAllStock(),
+    };
+  }
+
+  @Get('stocks/:id')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
+  async findAProductByStock(id: string) {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      products: await this.productsService.findAProductByStock(id),
     };
   }
 
@@ -77,16 +105,6 @@ export class ProductsController {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
       product: await this.productsService.findOne(id),
     };
-  }
-
-  @Patch(':id')
-  @UseGuards(AuthGuard, RulesGuard)
-  @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
-  async update(
-    @Param('id') id: string,
-    @Body() updateProductDto: UpdateProductDto,
-  ) {
-    return this.productsService.update(+id, updateProductDto);
   }
 
   @Delete(':id')
