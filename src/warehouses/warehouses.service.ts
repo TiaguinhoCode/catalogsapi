@@ -11,7 +11,6 @@ import { WarehousesMessages } from './../utils/common/messages/warehouses.menssa
 // Tipagem
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
-import { CompaniesMessages } from 'src/utils/common/messages/companies.menssages';
 
 @Injectable()
 export class WarehousesService {

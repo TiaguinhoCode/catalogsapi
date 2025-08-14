@@ -69,46 +69,51 @@ model Warehouses {
   created_at DateTime?  @default(now())
   updated_at DateTime?  @updatedAt
   Companies  Companies?
-  Stocks     Stocks?
+  Stocks     Stocks[]
 
   @@map("warehouses")
 }
 
 model Stocks {
-  warehouse_id        String     @unique
+  id                  String    @id @default(uuid())
+  warehouse_id        String
   current_quantity    Int
   minimium_quantity   Int
   maximum_quantity    Int
   price               Float
   purchase_price      Float
   cost_price          Float
-  has_discount        Boolean    @default(false)
-  discount_percentage Float
-  created_at          DateTime?  @default(now())
-  updated_at          DateTime?  @updatedAt
-  Products            Products[]
-  warehouse           Warehouses @relation(fields: [warehouse_id], references: [id])
+  has_discount        Boolean   @default(false)
+  discount_percentage Float?
+  created_at          DateTime? @default(now())
+  updated_at          DateTime? @updatedAt
+
+  Products  Products[]
+  warehouse Warehouses @relation(fields: [warehouse_id], references: [id])
 
   @@map("stocks")
 }
 
 model Products {
-  id                   String        @id @default(uuid())
+  id                   String    @id @default(uuid())
   name                 String
   stock_id             String
+  category_id          String
   brand_id             String
-  product_code         String        @unique
+  product_code         String    @unique
   description          String?
   sales_unit           String
-  is_active            Boolean       @default(true)
-  url_imagem           String
+  is_active            Boolean   @default(true)
+  url_imagem           String?
   date_of_inactivation DateTime?
-  created_at           DateTime?     @default(now())
-  updated_at           DateTime?     @updatedAt
-  items                Orders_Itens?
-  brand                Brands        @relation(fields: [brand_id], references: [id])
-  stock                Stocks        @relation(fields: [stock_id], references: [warehouse_id])
-  supliers             Suppliers[]   @relation("ProductsToSuppliers")
+  created_at           DateTime? @default(now())
+  updated_at           DateTime? @updatedAt
+
+  items    Orders_Itens?
+  brand    Brands        @relation(fields: [brand_id], references: [id])
+  stock    Stocks        @relation(fields: [stock_id], references: [id], onDelete: Cascade)
+  category Categories    @relation(fields: [category_id], references: [id])
+  supliers Suppliers[]   @relation("ProductsToSuppliers")
 
   @@map("products")
 }
@@ -121,6 +126,16 @@ model Brands {
   Products   Products[]
 
   @@map("brands")
+}
+
+model Categories {
+  id         String     @id @default(uuid())
+  name       String
+  created_at DateTime?  @default(now())
+  updated_at DateTime?  @updatedAt
+  Products   Products[]
+
+  @@map("categories")
 }
 
 model Suppliers {
