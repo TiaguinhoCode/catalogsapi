@@ -239,17 +239,17 @@ export class ProductsService {
         discount_percentage: data.has_discount
           ? data.discount_percentage
           : null,
-        Products: {
-          update: {
-            name: data.name,
-            category_id: data.category_id,
-            brand_id: data.brand_id,
-            product_code: data.product_code,
-            description: data.description,
-            sales_unit: data.sales_unit,
-            url_imagem: data.url_imagem,
-          },
-        },
+        // Products: {
+        //   update: {
+        //     data: data.name,
+        //     category_id: data.category_id,
+        //     brand_id: data.brand_id,
+        //     product_code: data.product_code,
+        //     description: data.description,
+        //     sales_unit: data.sales_unit,
+        //     url_imagem: data.url_imagem,
+        //   },
+        // },
       },
       select: { Products: true },
     });
