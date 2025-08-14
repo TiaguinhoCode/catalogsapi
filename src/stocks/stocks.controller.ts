@@ -1,0 +1,106 @@
+// Nest
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
+
+// Service
+import { StocksService } from './stocks.service';
+
+// Utils
+import { requestResponseMessages } from '../utils/common/messages/requestResponse.messages';
+
+// Midldleware
+import { AuthGuard } from '../users/auth/auth.guard';
+import { RulesGuard } from '../rules/guards/rules.guard';
+import { Rules } from './../rules/decorators/rules.decorator';
+import { rules } from './../rules/rules.enum';
+
+// Tipagem
+import { CreateStockDto } from './dto/create-stock.dto';
+import { UpdateStockDto } from './dto/update-stock.dto';
+
+@Controller('/stocks')
+export class StocksController {
+  constructor(private readonly stocksService: StocksService) {}
+
+  @Post()
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
+  async create(@Body() data: CreateStockDto) {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Produto'),
+      product: await this.stocksService.create(data),
+    };
+  }
+
+  @Get()
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
+  async findAll() {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      products: await this.stocksService.findAll(),
+    };
+  }
+
+  @Get('filters')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
+  async findProductFilter(
+    @Query('is_active') is_active?: string,
+    @Query('brands') brandsId?: string,
+    @Query('categories') categoriesId?: string,
+    @Query('warehouse') warehouseId?: string,
+  ) {
+    const isActiveParsed =
+      is_active === 'true' ? true : is_active === 'false' ? false : undefined;
+
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      products: await this.stocksService.findAllProductsByFilters(
+        isActiveParsed,
+        brandsId,
+        categoriesId,
+        warehouseId,
+      ),
+    };
+  }
+
+  @Get(':id')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
+  async findOne(@Param('id') id: string) {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      product: await this.stocksService.findOne(id),
+    };
+  }
+
+  @Patch(':id')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
+  async update(@Param('id') id: string, @Body() data: UpdateStockDto) {
+    return {
+      msg: requestResponseMessages.CHANGE_REQUEST('Produto'),
+      product: await this.stocksService.update(id, data),
+    };
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
+  async remove(@Param('id') id: string) {
+    return {
+      msg: requestResponseMessages.REMOVAL_REQUEST('Produto'),
+      product: await this.stocksService.remove(id),
+    };
+  }
+}

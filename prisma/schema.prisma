@@ -111,7 +111,7 @@ model Products {
 
   items    Orders_Itens?
   brand    Brands        @relation(fields: [brand_id], references: [id])
-  stock    Stocks        @relation(fields: [stock_id], references: [id])
+  stock    Stocks        @relation(fields: [stock_id], references: [id], onDelete: Cascade)
   category Categories    @relation(fields: [category_id], references: [id])
   supliers Suppliers[]   @relation("ProductsToSuppliers")
 
