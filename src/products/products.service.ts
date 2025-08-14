@@ -13,86 +13,10 @@ import { CategoriesMessages } from './../utils/common/messages/categories.menssa
 
 // Tipagem
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly client: PrismaService) {}
-
-  async create(data: CreateProductDto) {
-    await ensureUniqueField({
-      client: this.client,
-      model: 'products',
-      field: 'name',
-      value: data.name,
-      msg: ProductsMessages.PRODUCT_ALREADY_HAS_REGISTRATION,
-    });
-
-    await ensureUniqueField({
-      client: this.client,
-      model: 'warehouses',
-      field: 'id',
-      id: true,
-      value: data.stock_id,
-      msg: WarehousesMessages.WAREHOUSE_NOT_FOUND,
-    });
-
-    await ensureUniqueField({
-      client: this.client,
-      model: 'brands',
-      field: 'id',
-      id: true,
-      value: data.brand_id,
-      msg: BrandsMenssages.BRANDS_NOT_FOUND,
-    });
-
-    await ensureUniqueField({
-      client: this.client,
-      model: 'categories',
-      field: 'id',
-      id: true,
-      value: data.category_id,
-      msg: CategoriesMessages.CATEGORIES_NOT_FOUND,
-    });
-
-    await ensureUniqueField({
-      client: this.client,
-      model: 'products',
-      field: 'product_code',
-      value: data.product_code,
-      msg: ProductsMessages.BARCODE_ALREADY_REGISTERED,
-    });
-
-    const product = await this.client.stocks.create({
-      data: {
-        warehouse_id: data.stock_id,
-        current_quantity: data.current_quantity,
-        minimium_quantity: data.minimium_quantity,
-        maximum_quantity: data.maximum_quantity,
-        price: data.price,
-        purchase_price: data.purchase_price,
-        cost_price: data.cost_price,
-        has_discount: data.has_discount && data.has_discount,
-        discount_percentage: data.has_discount
-          ? data.discount_percentage
-          : null,
-        Products: {
-          create: {
-            name: data.name,
-            category_id: data.category_id,
-            brand_id: data.brand_id,
-            product_code: data.product_code,
-            description: data.description,
-            sales_unit: data.sales_unit,
-            url_imagem: data.url_imagem,
-          },
-        },
-      },
-      select: { Products: true },
-    });
-
-    return product.Products;
-  }
 
   async findAllProducts() {
     const products = await this.client.products.findMany({
@@ -224,38 +148,38 @@ export class ProductsService {
     return formatted;
   }
 
-  async update(id: string, data: UpdateProductDto) {
-    const product = await this.client.stocks.update({
-      where: { id },
-      data: {
-        warehouse_id: data.stock_id,
-        current_quantity: data.current_quantity,
-        minimium_quantity: data.minimium_quantity,
-        maximum_quantity: data.maximum_quantity,
-        price: data.price,
-        purchase_price: data.purchase_price,
-        cost_price: data.cost_price,
-        has_discount: data.has_discount && data.has_discount,
-        discount_percentage: data.has_discount
-          ? data.discount_percentage
-          : null,
-        Products: {
-          update: {
-            name: data.name,
-            category_id: data.category_id,
-            brand_id: data.brand_id,
-            product_code: data.product_code,
-            description: data.description,
-            sales_unit: data.sales_unit,
-            url_imagem: data.url_imagem,
-          },
-        },
-      },
-      select: { Products: true },
-    });
+  // async update(id: string, data: UpdateProductDto) {
+  //   const product = await this.client.stocks.update({
+  //     where: { id },
+  //     data: {
+  //       warehouse_id: data.stock_id,
+  //       current_quantity: data.current_quantity,
+  //       minimium_quantity: data.minimium_quantity,
+  //       maximum_quantity: data.maximum_quantity,
+  //       price: data.price,
+  //       purchase_price: data.purchase_price,
+  //       cost_price: data.cost_price,
+  //       has_discount: data.has_discount && data.has_discount,
+  //       discount_percentage: data.has_discount
+  //         ? data.discount_percentage
+  //         : null,
+  //       Products: {
+  //         update: {
+  //           name: data.name,
+  //           category_id: data.category_id,
+  //           brand_id: data.brand_id,
+  //           product_code: data.product_code,
+  //           description: data.description,
+  //           sales_unit: data.sales_unit,
+  //           url_imagem: data.url_imagem,
+  //         },
+  //       },
+  //     },
+  //     select: { Products: true },
+  //   });
 
-    return `This action updates a #${id} product`;
-  }
+  //   return `This action updates a #${id} product`;
+  // }
 
   async remove(id: number) {
     return `This action removes a #${id} product`;
