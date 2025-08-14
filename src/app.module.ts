@@ -18,6 +18,8 @@ import { MailService } from './mail/mail.service';
 import { WarehousesModule } from './warehouses/warehouses.module';
 import { BrandsModule } from './brands/brands.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
+import { StocksModule } from './stocks/stocks.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { CategoriesModule } from './categories/categories.module';
     WarehousesModule,
     BrandsModule,
     CategoriesModule,
+    ProductsModule,
+    StocksModule,
   ],
   controllers: [AppController],
   providers: [MailService],
