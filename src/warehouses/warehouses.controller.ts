@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 // Services
@@ -47,6 +48,17 @@ export class WarehousesController {
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
       warehouses: await this.warehousesService.findAll(),
+    };
+  }
+
+  @Get('filter')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
+  async findAllWarehousesByFilter(@Query('is_active') is_active?: string) {
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      warehouses:
+        await this.warehousesService.findAllWarehousesByFilter(is_active),
     };
   }
 

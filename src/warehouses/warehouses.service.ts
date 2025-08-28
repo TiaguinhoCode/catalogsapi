@@ -41,6 +41,19 @@ export class WarehousesService {
     return warehouse;
   }
 
+  async findAllWarehousesByFilter(is_active?: string) {
+    const active = is_active === 'true' ? true : false;
+
+    const warehouse = await this.client.warehouses.findMany({
+      where: { is_active: active },
+    });
+
+    if (!warehouse)
+      throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);
+
+    return warehouse;
+  }
+
   async findOne(id: string) {
     const warehouse = await ensureUniqueField({
       client: this.client,
