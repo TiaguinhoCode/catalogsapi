@@ -241,9 +241,9 @@ export class StocksService {
         description: true,
         product_code: true,
         sales_unit: true,
-        brand: { select: { name: true } },
+        brand: { select: { id: true, name: true } },
         category: {
-          select: { name: true },
+          select: { id: true, name: true },
         },
         is_active: true,
         date_of_inactivation: true,
@@ -273,8 +273,6 @@ export class StocksService {
 
     const formatted = {
       ...product,
-      brand: product.brand?.name ?? null,
-      category: product.category?.name ?? null,
       stock: product.stock
         ? {
             warehouse_id: product.stock.warehouse?.id ?? null,
