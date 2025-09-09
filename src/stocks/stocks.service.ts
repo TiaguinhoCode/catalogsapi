@@ -24,7 +24,7 @@ export class StocksService {
       client: this.client,
       model: 'products',
       field: 'name',
-      value: data.name,
+      value: data.name.toLowerCase(),
       msg: ProductsMessages.PRODUCT_ALREADY_HAS_REGISTRATION,
     });
 

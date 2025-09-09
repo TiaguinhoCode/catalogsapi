@@ -21,7 +21,7 @@ export class CategoriesService {
       client: this.client,
       model: 'categories',
       field: 'name',
-      value: data.name,
+      value: data.name.toLowerCase(),
       msg: CategoriesMessages.CATEGORIES_ALREADY_HAS_REGISTRATION,
     });
 

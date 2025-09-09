@@ -21,7 +21,7 @@ export class BrandsService {
       client: this.client,
       model: 'brands',
       field: 'name',
-      value: data.name,
+      value: data.name.toLowerCase(),
       msg: BrandsMenssages.BRANDS_ALREADY_HAS_REGISTRATION,
     });
 

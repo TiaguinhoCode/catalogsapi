@@ -21,7 +21,7 @@ export class WarehousesService {
       client: this.client,
       model: 'Warehouses',
       field: 'name',
-      value: data.name,
+      value: data.name.toLowerCase(),
       msg: WarehousesMessages.WAREHOUSE_ALREADY_REGISTERED,
     });
 
