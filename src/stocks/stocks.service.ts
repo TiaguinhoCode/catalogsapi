@@ -161,14 +161,14 @@ export class StocksService {
   ) {
     const where: any = {
       ...(is_active !== undefined && { is_active }),
-      ...(brandsId && { brand_id: { in: brandsId.split(',') } }),
-      ...(categoriesId && { category_id: { in: categoriesId.split(',') } }),
-      ...(warehouseId && {
-        stock: {
-          is: {
-            warehouse_id: warehouseId,
-          },
-        },
+      ...(brandsId && typeof brandsId === 'string' && {
+        brand_id: { in: brandsId.split(',') },
+      }),
+      ...(categoriesId && typeof categoriesId === 'string' && {
+        category_id: { in: categoriesId.split(',') },
+      }),
+      ...(warehouseId && typeof warehouseId === 'string' && {
+        stock: { warehouse_id: {in: warehouseId.split(',')}},
       }),
     };
 
