@@ -78,6 +78,9 @@ export class BrandsService {
       msg: BrandsMenssages.BRANDS_NOT_FOUND,
     });
 
+    // const brandID = await this.client.brands.findFirst({ where: { id } });
+    // if (!brandID) throw new NotFoundException(BrandsMenssages.BRANDS_NOT_FOUND);
+
     const brand = await this.client.brands.delete({ where: { id } });
 
     return brand;
