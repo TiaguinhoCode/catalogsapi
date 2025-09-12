@@ -28,7 +28,10 @@ export async function ensureUniqueField<M extends keyof PrismaClient>(
         NOT: [{ id: value as string }],
       };
 
-  const whereClause = { [field]: value, ...notClause };
+  const whereClause = {
+    [field]: { equals: value, mode: 'insensitive' },
+    ...notClause,
+  };
 
   const found = id
     ? await repo.findUnique({ where: whereClause })
