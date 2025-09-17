@@ -26,6 +26,7 @@ import { rules } from './../rules/rules.enum';
 // Tipagem
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 
 @Controller('/stocks')
 export class StocksController {
@@ -59,18 +60,26 @@ export class StocksController {
     @Query('brands') brandsId?: string,
     @Query('categories') categoriesId?: string,
     @Query('warehouse') warehouseId?: string,
+    @Query('search') search?: string,
+    @Query('orderByStock') orderByStock?: 'asc' | 'desc',
+    @Query() paginationDto?: PaginationDto,
   ) {
     const isActiveParsed =
       is_active === 'true' ? true : is_active === 'false' ? false : undefined;
 
+    const product = await this.stocksService.findAllProductsByFilters(
+      isActiveParsed,
+      brandsId,
+      categoriesId,
+      warehouseId,
+      search,
+      orderByStock,
+      paginationDto,
+    );
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      products: await this.stocksService.findAllProductsByFilters(
-        isActiveParsed,
-        brandsId,
-        categoriesId,
-        warehouseId,
-      ),
+      product,
     };
   }
 

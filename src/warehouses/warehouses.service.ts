@@ -1,5 +1,9 @@
 // Nest
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 // Bibliotecas
 import { PrismaService } from './../database/prisma.service';
@@ -86,7 +90,7 @@ export class WarehousesService {
   }
 
   async remove(id: string) {
-    await ensureUniqueField({
+    const warehouseValidation = await ensureUniqueField({
       client: this.client,
       model: 'Warehouses',
       field: 'id',
@@ -94,6 +98,12 @@ export class WarehousesService {
       value: id,
       msg: WarehousesMessages.WAREHOUSE_NOT_FOUND,
     });
+
+    if ((warehouseValidation as any).name === 'Estoque Online') {
+      throw new BadRequestException(
+        'Não é permitido excluir o almoxarifado Estoque Online, pois ele está vinculado ao catálogo digital é essencial para o funcionamento do estoque online.',
+      );
+    }
 
     const warehouse = await this.client.warehouses.delete({
       where: { id },

@@ -19,6 +19,10 @@ async function main() {
     skipDuplicates: true,
   });
 
+  await prisma.warehouses.create({
+    data: { name: 'Estoque Online' },
+  });
+
   const rules = await prisma.rules.findMany({
     where: { name: 'Suporte do Sistema' },
   });
@@ -52,10 +56,7 @@ async function main() {
       },
     });
   }
-  console.log(
-    'Padrões de regras e usuários inseridos se ainda não existirem',
-    support.length,
-  );
+  console.log('Padrões de regras e usuários inseridos se ainda não existirem');
 }
 
 main()
