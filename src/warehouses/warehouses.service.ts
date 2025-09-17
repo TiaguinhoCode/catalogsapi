@@ -21,7 +21,7 @@ export class WarehousesService {
       client: this.client,
       model: 'Warehouses',
       field: 'name',
-      value: data.name,
+      value: data.name.toLowerCase(),
       msg: WarehousesMessages.WAREHOUSE_ALREADY_REGISTERED,
     });
 
@@ -34,6 +34,19 @@ export class WarehousesService {
 
   async findAll() {
     const warehouse = await this.client.warehouses.findMany();
+
+    if (!warehouse)
+      throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);
+
+    return warehouse;
+  }
+
+  async findAllWarehousesByFilter(is_active?: string) {
+    const active = is_active === 'true' ? true : false;
+
+    const warehouse = await this.client.warehouses.findMany({
+      where: { is_active: active },
+    });
 
     if (!warehouse)
       throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);

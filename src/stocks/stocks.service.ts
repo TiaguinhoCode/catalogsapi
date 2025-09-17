@@ -24,7 +24,7 @@ export class StocksService {
       client: this.client,
       model: 'products',
       field: 'name',
-      value: data.name,
+      value: data.name.toLowerCase(),
       msg: ProductsMessages.PRODUCT_ALREADY_HAS_REGISTRATION,
     });
 
@@ -161,15 +161,18 @@ export class StocksService {
   ) {
     const where: any = {
       ...(is_active !== undefined && { is_active }),
-      ...(brandsId && { brand_id: { in: brandsId.split(',') } }),
-      ...(categoriesId && { category_id: { in: categoriesId.split(',') } }),
-      ...(warehouseId && {
-        stock: {
-          is: {
-            warehouse_id: warehouseId,
-          },
-        },
-      }),
+      ...(brandsId &&
+        typeof brandsId === 'string' && {
+          brand_id: { in: brandsId.split(',') },
+        }),
+      ...(categoriesId &&
+        typeof categoriesId === 'string' && {
+          category_id: { in: categoriesId.split(',') },
+        }),
+      ...(warehouseId &&
+        typeof warehouseId === 'string' && {
+          stock: { warehouse_id: { in: warehouseId.split(',') } },
+        }),
     };
 
     const products = await this.client.products.findMany({
@@ -241,9 +244,9 @@ export class StocksService {
         description: true,
         product_code: true,
         sales_unit: true,
-        brand: { select: { name: true } },
+        brand: { select: { id: true, name: true } },
         category: {
-          select: { name: true },
+          select: { id: true, name: true },
         },
         is_active: true,
         date_of_inactivation: true,
@@ -273,8 +276,6 @@ export class StocksService {
 
     const formatted = {
       ...product,
-      brand: product.brand?.name ?? null,
-      category: product.category?.name ?? null,
       stock: product.stock
         ? {
             warehouse_id: product.stock.warehouse?.id ?? null,
