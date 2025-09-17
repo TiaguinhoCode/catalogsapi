@@ -161,15 +161,18 @@ export class StocksService {
   ) {
     const where: any = {
       ...(is_active !== undefined && { is_active }),
-      ...(brandsId && typeof brandsId === 'string' && {
-        brand_id: { in: brandsId.split(',') },
-      }),
-      ...(categoriesId && typeof categoriesId === 'string' && {
-        category_id: { in: categoriesId.split(',') },
-      }),
-      ...(warehouseId && typeof warehouseId === 'string' && {
-        stock: { warehouse_id: {in: warehouseId.split(',')}},
-      }),
+      ...(brandsId &&
+        typeof brandsId === 'string' && {
+          brand_id: { in: brandsId.split(',') },
+        }),
+      ...(categoriesId &&
+        typeof categoriesId === 'string' && {
+          category_id: { in: categoriesId.split(',') },
+        }),
+      ...(warehouseId &&
+        typeof warehouseId === 'string' && {
+          stock: { warehouse_id: { in: warehouseId.split(',') } },
+        }),
     };
 
     const products = await this.client.products.findMany({
