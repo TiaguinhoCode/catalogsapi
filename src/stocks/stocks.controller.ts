@@ -26,6 +26,7 @@ import { rules } from './../rules/rules.enum';
 // Tipagem
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 
 @Controller('/stocks')
 export class StocksController {
@@ -44,10 +45,15 @@ export class StocksController {
   @Get()
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
-  async findAll() {
+  async findAll(@Query() paginationDto?: PaginationDto) {
+    const result = await this.stocksService.findAll(paginationDto);
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      products: await this.stocksService.findAll(),
+      products: result.formatted,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 
@@ -59,18 +65,29 @@ export class StocksController {
     @Query('brands') brandsId?: string,
     @Query('categories') categoriesId?: string,
     @Query('warehouse') warehouseId?: string,
+    @Query('search') search?: string,
+    @Query('orderByStock') orderByStock?: 'asc' | 'desc',
+    @Query() paginationDto?: PaginationDto,
   ) {
     const isActiveParsed =
       is_active === 'true' ? true : is_active === 'false' ? false : undefined;
 
+    const result = await this.stocksService.findAllProductsByFilters(
+      isActiveParsed,
+      brandsId,
+      categoriesId,
+      warehouseId,
+      search,
+      orderByStock,
+      paginationDto,
+    );
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      products: await this.stocksService.findAllProductsByFilters(
-        isActiveParsed,
-        brandsId,
-        categoriesId,
-        warehouseId,
-      ),
+      products: result.formatted,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 

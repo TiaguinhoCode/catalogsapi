@@ -14,10 +14,6 @@ import {
 // Services
 import { WarehousesService } from './warehouses.service';
 
-// Tipagem
-import { CreateWarehouseDto } from './dto/create-warehouse.dto';
-import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
-
 // Middleware
 import { AuthGuard } from './../users/auth/auth.guard';
 import { RulesGuard } from './../rules/guards/rules.guard';
@@ -26,6 +22,11 @@ import { rules } from './../rules/rules.enum';
 
 // Utils
 import { requestResponseMessages } from './../utils/common/messages/requestResponse.messages';
+
+// Tipagem
+import { CreateWarehouseDto } from './dto/create-warehouse.dto';
+import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 
 @Controller('warehouses')
 export class WarehousesController {
@@ -44,21 +45,38 @@ export class WarehousesController {
   @Get()
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
-  async findAll() {
+  async findAll(@Query() paginationDto?: PaginationDto) {
+    const result = await this.warehousesService.findAll(paginationDto);
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      warehouses: await this.warehousesService.findAll(),
+      warehouses: result.warehouse,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 
   @Get('filter')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.ESTOQUE, rules.DONO)
-  async findAllWarehousesByFilter(@Query('is_active') is_active?: string) {
+  async findAllWarehousesByFilter(
+    @Query('is_active') is_active?: string,
+    @Query('search') search?: string,
+    @Query() paginationDto?: PaginationDto,
+  ) {
+    const result = await this.warehousesService.findAllWarehousesByFilter(
+      is_active,
+      search,
+      paginationDto,
+    );
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      warehouses:
-        await this.warehousesService.findAllWarehousesByFilter(is_active),
+      warehouses: result.warehouse,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 

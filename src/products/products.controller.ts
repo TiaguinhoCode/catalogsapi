@@ -6,16 +6,22 @@ import { ProductsService } from './products.service';
 
 // Tipagem
 import { requestResponseMessages } from './../utils/common/messages/requestResponse.messages';
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  async findAllProducts() {
+  async findAllProducts(@Query() paginationDto?: PaginationDto) {
+    const result = await this.productsService.findAllProducts(paginationDto);
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      products: await this.productsService.findAllProducts(),
+      products: result.formatted,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 
@@ -23,13 +29,22 @@ export class ProductsController {
   async findAllProductsByFilter(
     @Query('brands') brandsId?: string,
     @Query('categories') categoriesId?: string,
+    @Query('search') search?: string,
+    @Query() paginationDto?: PaginationDto,
   ) {
+    const result = await this.productsService.findAllProductsByFilter(
+      brandsId,
+      categoriesId,
+      search,
+      paginationDto,
+    );
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      products: await this.productsService.findAllProductsByFilter(
-        brandsId,
-        categoriesId,
-      ),
+      products: result.formatted,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 
