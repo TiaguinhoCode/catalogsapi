@@ -96,6 +96,12 @@ export class StocksService {
   }
 
   async findAll(pagination?: PaginationDto) {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const total = await this.client.products.count();
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
     const products = await this.client.products.findMany({
       select: {
         id: true,
@@ -130,12 +136,14 @@ export class StocksService {
           },
         },
       },
+      skip: skip,
+      take: limit,
     });
 
     if (!products)
       throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
 
-    return products.map((item) => {
+    const formatted = products.map((item) => {
       const formattedStock = item.stock
         ? {
             ...item.stock,
@@ -152,6 +160,13 @@ export class StocksService {
         stock: formattedStock,
       };
     });
+
+    return {
+      formatted,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   }
 
   async findAllProductsByFilters(
@@ -264,7 +279,7 @@ export class StocksService {
     if (products.length <= 0)
       throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
 
-    return products.map((item) => {
+    const formatted = products.map((item) => {
       const formattedStock = item.stock
         ? {
             ...item.stock,
@@ -279,11 +294,15 @@ export class StocksService {
         brand: item.brand?.name ?? null,
         category: item.category?.name ?? null,
         stock: formattedStock,
-        totalItems: total,
-        totalPages: totalPages,
-        currentPage: page,
       };
     });
+
+    return {
+      formatted,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   }
 
   async findOne(id: string) {

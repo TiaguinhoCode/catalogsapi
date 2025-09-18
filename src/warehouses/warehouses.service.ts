@@ -16,6 +16,9 @@ import { WarehousesMessages } from './../utils/common/messages/warehouses.menssa
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 
+// Tipagem
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+
 @Injectable()
 export class WarehousesService {
   constructor(private readonly client: PrismaService) {}
@@ -36,26 +39,65 @@ export class WarehousesService {
     return warehouse;
   }
 
-  async findAll() {
-    const warehouse = await this.client.warehouses.findMany();
-
-    if (!warehouse)
-      throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);
-
-    return warehouse;
-  }
-
-  async findAllWarehousesByFilter(is_active?: string) {
-    const active = is_active === 'true' ? true : false;
+  async findAll(pagination?: PaginationDto) {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const total = await this.client.warehouses.count();
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
 
     const warehouse = await this.client.warehouses.findMany({
-      where: { is_active: active },
+      skip,
+      take: limit,
     });
 
-    if (!warehouse)
+    if (warehouse.length <= 0)
       throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);
 
-    return warehouse;
+    return {
+      warehouse,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
+  }
+
+  async findAllWarehousesByFilter(
+    is_active?: string,
+    search?: string,
+    pagination?: PaginationDto,
+  ) {
+    const active = is_active === 'true' ? true : false;
+
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const total = await this.client.warehouses.count({
+      where: {
+        is_active: active,
+        name: { contains: search, mode: 'insensitive' },
+      },
+    });
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
+    const warehouse = await this.client.warehouses.findMany({
+      where: {
+        is_active: active,
+        name: { contains: search, mode: 'insensitive' },
+      },
+      skip,
+      take: limit,
+    });
+
+    if (warehouse.length <= 0)
+      throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);
+
+    return {
+      warehouse,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   }
 
   async findOne(id: string) {

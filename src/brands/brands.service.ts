@@ -11,6 +11,7 @@ import { BrandsMenssages } from './../utils/common/messages/brands.menssages';
 // Tipagem
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 
 @Injectable()
 export class BrandsService {
@@ -32,12 +33,51 @@ export class BrandsService {
     return brand;
   }
 
-  async findAll() {
-    const brands = await this.client.brands.findMany();
+  async findAll(pagination?: PaginationDto) {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const total = await this.client.brands.count();
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
 
-    if (!brands) throw new NotFoundException(BrandsMenssages.BRANDS_NOT_FOUND);
+    const brands = await this.client.brands.findMany({ skip, take: limit });
 
-    return brands;
+    if (brands.length <= 0)
+      throw new NotFoundException(BrandsMenssages.BRANDS_NOT_FOUND);
+
+    return {
+      brands,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
+  }
+
+  async findFilterServices(search?: string, pagination?: PaginationDto) {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const total = await this.client.brands.count({
+      where: { name: { contains: search, mode: 'insensitive' } },
+    });
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
+    const brands = await this.client.brands.findMany({
+      where: { name: { contains: search, mode: 'insensitive' } },
+      skip,
+      take: limit,
+    });
+
+    if (brands.length <= 0) {
+      throw new NotFoundException(BrandsMenssages.BRANDS_NOT_FOUND);
+    }
+
+    return {
+      brands,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   }
 
   async findOne(id: string) {
@@ -77,9 +117,6 @@ export class BrandsService {
       value: id,
       msg: BrandsMenssages.BRANDS_NOT_FOUND,
     });
-
-    // const brandID = await this.client.brands.findFirst({ where: { id } });
-    // if (!brandID) throw new NotFoundException(BrandsMenssages.BRANDS_NOT_FOUND);
 
     const brand = await this.client.brands.delete({ where: { id } });
 

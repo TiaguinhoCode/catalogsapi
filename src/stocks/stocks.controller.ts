@@ -45,10 +45,15 @@ export class StocksController {
   @Get()
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
-  async findAll() {
+  async findAll(@Query() paginationDto?: PaginationDto) {
+    const result = await this.stocksService.findAll(paginationDto);
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      products: await this.stocksService.findAll(),
+      products: result.formatted,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 
@@ -67,7 +72,7 @@ export class StocksController {
     const isActiveParsed =
       is_active === 'true' ? true : is_active === 'false' ? false : undefined;
 
-    const product = await this.stocksService.findAllProductsByFilters(
+    const result = await this.stocksService.findAllProductsByFilters(
       isActiveParsed,
       brandsId,
       categoriesId,
@@ -79,7 +84,10 @@ export class StocksController {
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      product,
+      products: result.formatted,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 

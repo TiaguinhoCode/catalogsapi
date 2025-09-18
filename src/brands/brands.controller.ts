@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 // Services
@@ -25,6 +26,7 @@ import { requestResponseMessages } from './../utils/common/messages/requestRespo
 // Tipagem
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 
 @Controller('brands')
 export class BrandsController {
@@ -41,10 +43,34 @@ export class BrandsController {
   }
 
   @Get()
-  async findAll() {
+  async findAll(@Query() PaginationDto?: PaginationDto) {
+    const result = await this.brandsService.findAll(PaginationDto);
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      brands: await this.brandsService.findAll(),
+      brands: result.brands,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
+    };
+  }
+
+  @Get('filter')
+  async findFilterServices(
+    @Query('search') search?: string,
+    @Query() paginationDto?: PaginationDto,
+  ) {
+    const result = await this.brandsService.findFilterServices(
+      search,
+      paginationDto,
+    );
+
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      brands: result.brands,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 

@@ -19,8 +19,9 @@ async function main() {
     skipDuplicates: true,
   });
 
-  await prisma.warehouses.create({
+  await prisma.warehouses.createMany({
     data: { name: 'Estoque Online' },
+    skipDuplicates: true,
   });
 
   const rules = await prisma.rules.findMany({
