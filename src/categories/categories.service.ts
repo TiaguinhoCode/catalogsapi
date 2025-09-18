@@ -11,6 +11,7 @@ import { CategoriesMessages } from './../utils/common/messages/categories.menssa
 // Tipagem
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -30,13 +31,54 @@ export class CategoriesService {
     return category;
   }
 
-  async findAll() {
-    const categories = await this.client.categories.findMany();
+  async findAll(pagination?: PaginationDto) {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const total = await this.client.categories.count();
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
+    const categories = await this.client.categories.findMany({
+      skip,
+      take: limit,
+    });
 
     if (!categories)
       throw new NotFoundException(CategoriesMessages.CATEGORIES_NOT_FOUND);
 
-    return categories;
+    return {
+      categories,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
+  }
+
+  async findAllCategories(search?: string, pagination?: PaginationDto) {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const total = await this.client.categories.count({
+      where: { name: { contains: search, mode: 'insensitive' } },
+    });
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
+    const categories = await this.client.categories.findMany({
+      where: { name: { contains: search, mode: 'insensitive' } },
+      skip,
+      take: limit,
+    });
+
+    if (categories.length <= 0) {
+      throw new NotFoundException(CategoriesMessages.CATEGORIES_NOT_FOUND);
+    }
+
+    return {
+      categories,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   }
 
   async findOne(id: string) {

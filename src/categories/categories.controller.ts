@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 // Services
@@ -25,6 +26,7 @@ import { requestResponseMessages } from './../utils/common/messages/requestRespo
 // Tipagem
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -41,10 +43,31 @@ export class CategoriesController {
   }
 
   @Get()
-  async findAll() {
+  async findAll(@Query() paginationDto?: PaginationDto) {
+    const result = await this.categoriesService.findAll(paginationDto);
+
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      categories: await this.categoriesService.findAll(),
+      categories: result.categories,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
+    };
+  }
+
+  @Get('filter')
+  async findAllCategories(
+    @Query('search') search?: string,
+    @Query() paginationDto?: PaginationDto,
+  ) {
+    const result = await this.categoriesService.findAllCategories(search, paginationDto);
+
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      categories: result.categories,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
     };
   }
 

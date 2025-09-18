@@ -1,5 +1,9 @@
 // Nest
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 // Bibliotecas
 import { PrismaService } from './../database/prisma.service';
@@ -11,6 +15,9 @@ import { WarehousesMessages } from './../utils/common/messages/warehouses.menssa
 // Tipagem
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
+
+// Tipagem
+import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 
 @Injectable()
 export class WarehousesService {
@@ -32,26 +39,65 @@ export class WarehousesService {
     return warehouse;
   }
 
-  async findAll() {
-    const warehouse = await this.client.warehouses.findMany();
-
-    if (!warehouse)
-      throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);
-
-    return warehouse;
-  }
-
-  async findAllWarehousesByFilter(is_active?: string) {
-    const active = is_active === 'true' ? true : false;
+  async findAll(pagination?: PaginationDto) {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const total = await this.client.warehouses.count();
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
 
     const warehouse = await this.client.warehouses.findMany({
-      where: { is_active: active },
+      skip,
+      take: limit,
     });
 
-    if (!warehouse)
+    if (warehouse.length <= 0)
       throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);
 
-    return warehouse;
+    return {
+      warehouse,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
+  }
+
+  async findAllWarehousesByFilter(
+    is_active?: string,
+    search?: string,
+    pagination?: PaginationDto,
+  ) {
+    const active = is_active === 'true' ? true : false;
+
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
+    const total = await this.client.warehouses.count({
+      where: {
+        is_active: active,
+        name: { contains: search, mode: 'insensitive' },
+      },
+    });
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
+    const warehouse = await this.client.warehouses.findMany({
+      where: {
+        is_active: active,
+        name: { contains: search, mode: 'insensitive' },
+      },
+      skip,
+      take: limit,
+    });
+
+    if (warehouse.length <= 0)
+      throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);
+
+    return {
+      warehouse,
+      totalItems: total,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   }
 
   async findOne(id: string) {
@@ -86,7 +132,7 @@ export class WarehousesService {
   }
 
   async remove(id: string) {
-    await ensureUniqueField({
+    const warehouseValidation = await ensureUniqueField({
       client: this.client,
       model: 'Warehouses',
       field: 'id',
@@ -94,6 +140,12 @@ export class WarehousesService {
       value: id,
       msg: WarehousesMessages.WAREHOUSE_NOT_FOUND,
     });
+
+    if ((warehouseValidation as any).name === 'Estoque Online') {
+      throw new BadRequestException(
+        'Não é permitido excluir o almoxarifado Estoque Online, pois ele está vinculado ao catálogo digital é essencial para o funcionamento do estoque online.',
+      );
+    }
 
     const warehouse = await this.client.warehouses.delete({
       where: { id },
