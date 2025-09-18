@@ -11,7 +11,7 @@ import { CategoriesMessages } from './../utils/common/messages/categories.menssa
 // Tipagem
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { PaginationDto } from './../pagination/dto/pagination.dto';
 
 @Injectable()
 export class CategoriesService {

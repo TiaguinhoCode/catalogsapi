@@ -6,7 +6,7 @@ import { ProductsService } from './products.service';
 
 // Tipagem
 import { requestResponseMessages } from './../utils/common/messages/requestResponse.messages';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { PaginationDto } from './../pagination/dto/pagination.dto';
 
 @Controller('products')
 export class ProductsController {

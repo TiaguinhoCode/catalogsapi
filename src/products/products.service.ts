@@ -9,7 +9,7 @@ import { ProductsMessages } from './../utils/common/messages/products.menssages'
 import { Prisma } from 'generated/prisma';
 
 // Tipagem
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { PaginationDto } from './../pagination/dto/pagination.dto';
 
 @Injectable()
 export class ProductsService {

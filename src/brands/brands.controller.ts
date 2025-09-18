@@ -26,7 +26,7 @@ import { requestResponseMessages } from './../utils/common/messages/requestRespo
 // Tipagem
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { PaginationDto } from './../pagination/dto/pagination.dto';
 
 @Controller('brands')
 export class BrandsController {

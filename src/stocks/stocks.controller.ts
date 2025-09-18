@@ -26,7 +26,7 @@ import { rules } from './../rules/rules.enum';
 // Tipagem
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { PaginationDto } from './../pagination/dto/pagination.dto';
 
 @Controller('/stocks')
 export class StocksController {

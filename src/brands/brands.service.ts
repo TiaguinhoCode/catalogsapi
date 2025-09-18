@@ -11,7 +11,7 @@ import { BrandsMenssages } from './../utils/common/messages/brands.menssages';
 // Tipagem
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { PaginationDto } from './../pagination/dto/pagination.dto';
 
 @Injectable()
 export class BrandsService {
