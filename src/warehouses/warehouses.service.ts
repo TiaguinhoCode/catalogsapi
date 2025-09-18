@@ -17,7 +17,7 @@ import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 
 // Tipagem
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { PaginationDto } from './../pagination/dto/pagination.dto';
 
 @Injectable()
 export class WarehousesService {
