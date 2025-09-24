@@ -67,10 +67,13 @@ export class StocksController {
     @Query('warehouse') warehouseId?: string,
     @Query('search') search?: string,
     @Query('orderByStock') orderByStock?: 'asc' | 'desc',
+    @Query('lowStock') lowStock?: string,
     @Query() paginationDto?: PaginationDto,
   ) {
     const isActiveParsed =
       is_active === 'true' ? true : is_active === 'false' ? false : undefined;
+    const isLowStockParsed =
+      lowStock === 'true' ? true : is_active === 'false' ? false : undefined;
 
     const result = await this.stocksService.findAllProductsByFilters(
       isActiveParsed,
@@ -79,6 +82,7 @@ export class StocksController {
       warehouseId,
       search,
       orderByStock,
+      isLowStockParsed,
       paginationDto,
     );
 
