@@ -186,34 +186,48 @@ export class StocksService {
     }
 
     const where: any = {
-      ...(is_active !== undefined && { is_active }),
-      ...(brandsId && {
-        brand_id: { in: brandsId.split(',') },
-      }),
-      ...(categoriesId && {
-        category_id: { in: categoriesId.split(',') },
-      }),
-      ...(warehouseId && {
-        stock: { warehouse_id: { in: warehouseId.split(',') } },
-      }),
-      ...(search && {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-          { product_code: { contains: search, mode: 'insensitive' } },
-          { 'brand.name': { contains: search, mode: 'insensitive' } },
-          { 'category.name': { contains: search, mode: 'insensitive' } },
-          { 'stock.warehouse.name': { contains: search, mode: 'insensitive' } },
-        ],
-      }),
-      ...(lowStock && {
+  ...(is_active !== undefined && { is_active }),
+  ...(brandsId && {
+    brand_id: { in: brandsId.split(',') },
+  }),
+  ...(categoriesId && {
+    category_id: { in: categoriesId.split(',') },
+  }),
+  ...(warehouseId && {
+    stock: { warehouse_id: { in: warehouseId.split(',') } },
+  }),
+  ...(search && {
+    OR: [
+      { name: { contains: search, mode: 'insensitive' } },
+      { description: { contains: search, mode: 'insensitive' } },
+      { product_code: { contains: search, mode: 'insensitive' } },
+      {
+        brand: {
+          name: { contains: search, mode: 'insensitive' },
+        },
+      },
+      {
+        category: {
+          name: { contains: search, mode: 'insensitive' },
+        },
+      },
+      {
         stock: {
-          current_quantity: {
-            lte: this.client.stocks.fields.minimium_quantity,
+          warehouse: {
+            name: { contains: search, mode: 'insensitive' },
           },
         },
-      }),
-    };
+      },
+    ],
+  }),
+  ...(lowStock && {
+    stock: {
+      current_quantity: {
+        lte: this.client.stocks.fields.minimium_quantity,
+      },
+    },
+  }),
+};
 
     const page = pagination?.page ?? 1;
     const limit = pagination?.limit ?? 10;
