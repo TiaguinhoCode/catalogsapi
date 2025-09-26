@@ -7,62 +7,26 @@ import { PrismaService } from '../database/prisma.service';
 // Utils
 import { ensureUniqueField } from './../utils/fieldValidation/validation';
 import { ProductsMessages } from '../utils/common/messages/products.menssages';
-import { WarehousesMessages } from '../utils/common/messages/warehouses.menssages';
-import { BrandsMenssages } from '../utils/common/messages/brands.menssages';
-import { CategoriesMessages } from '../utils/common/messages/categories.menssages';
+
+// Utils
+import { paginations } from '../utils/paginations';
+import { formatData } from './../utils/formattedData/index';
+import { fieldMap } from './../utils/fieldsFormatted/stocks/index';
+import { validateStockData } from './stock.validations';
 
 // Tipagem
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
 import { PaginationDto } from './../pagination/dto/pagination.dto';
+import { FormattedStock, ItemsStock } from '../type/formattedProducts/index';
+
 
 @Injectable()
 export class StocksService {
   constructor(private readonly client: PrismaService) {}
 
-  async create(data: CreateStockDto) {
-    await ensureUniqueField({
-      client: this.client,
-      model: 'products',
-      field: 'name',
-      value: data.name.toLowerCase(),
-      msg: ProductsMessages.PRODUCT_ALREADY_HAS_REGISTRATION,
-    });
-
-    await ensureUniqueField({
-      client: this.client,
-      model: 'warehouses',
-      field: 'id',
-      id: true,
-      value: data.stock_id,
-      msg: WarehousesMessages.WAREHOUSE_NOT_FOUND,
-    });
-
-    await ensureUniqueField({
-      client: this.client,
-      model: 'brands',
-      field: 'id',
-      id: true,
-      value: data.brand_id,
-      msg: BrandsMenssages.BRANDS_NOT_FOUND,
-    });
-
-    await ensureUniqueField({
-      client: this.client,
-      model: 'categories',
-      field: 'id',
-      id: true,
-      value: data.category_id,
-      msg: CategoriesMessages.CATEGORIES_NOT_FOUND,
-    });
-
-    await ensureUniqueField({
-      client: this.client,
-      model: 'products',
-      field: 'product_code',
-      value: data.product_code,
-      msg: ProductsMessages.BARCODE_ALREADY_REGISTERED,
-    });
+  async createStock(data: CreateStockDto) {
+    await validateStockData({ client: this.client, data });
 
     const product = await this.client.stocks.create({
       data: {
@@ -95,12 +59,13 @@ export class StocksService {
     return product.Products;
   }
 
-  async findAll(pagination?: PaginationDto) {
-    const page = pagination?.page ?? 1;
-    const limit = pagination?.limit ?? 10;
-    const total = await this.client.products.count();
-    const totalPages = Math.ceil(total / limit);
-    const skip = (page - 1) * limit;
+  async findAllStock(pagination?: PaginationDto) {
+    const { skip, totalItems, limit, totalPages, currentPage } =
+      await paginations({
+        client: this.client,
+        model: 'products',
+        pagination,
+      });
 
     const products = await this.client.products.findMany({
       select: {
@@ -143,166 +108,94 @@ export class StocksService {
     if (!products)
       throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
 
-    const formatted = products.map((item) => {
-      const formattedStock = item.stock
-        ? {
-            ...item.stock,
-            warehouse_name: item.stock.warehouse?.name ?? null,
-          }
-        : null;
-
-      if (formattedStock) delete (formattedStock as any).warehouse;
-
-      return {
-        ...item,
-        brand: item.brand?.name ?? null,
-        category: item.category?.name ?? null,
-        stock: formattedStock,
-      };
-    });
+    const formatted = formatData<ItemsStock, FormattedStock>(
+      products as any,
+      fieldMap,
+    );
 
     return {
       formatted,
-      totalItems: total,
-      totalPages: totalPages,
-      currentPage: page,
+      totalItems,
+      totalPages,
+      currentPage,
     };
   }
 
-  async findAllProductsByFilters(
-    is_active?: boolean,
-    brandsId?: string,
-    categoriesId?: string,
-    warehouseId?: string,
-    search?: string,
-    orderByStock?: 'asc' | 'desc',
-    lowStock?: boolean,
-    pagination?: PaginationDto,
-  ) {
-    const orderBy: any = [];
+  // async findStockByFilter({
+  //   params,
+  //   pagination,
+  // }: {
+  //   params: filterParams;
+  //   pagination?: PaginationDto;
+  // }) {
+  //   const orderBy: any = [];
+  //   const where = buildWhereFilter('products', params);
 
-    if (orderByStock) {
-      orderBy.push({ stock: { current_quantity: orderByStock } });
-    }
+  //   if (params.orderByStock) {
+  //     orderBy.push({ stock: { current_quantity: params.orderByStock } });
+  //   }
 
-    const where: any = {
-  ...(is_active !== undefined && { is_active }),
-  ...(brandsId && {
-    brand_id: { in: brandsId.split(',') },
-  }),
-  ...(categoriesId && {
-    category_id: { in: categoriesId.split(',') },
-  }),
-  ...(warehouseId && {
-    stock: { warehouse_id: { in: warehouseId.split(',') } },
-  }),
-  ...(search && {
-    OR: [
-      { name: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } },
-      { product_code: { contains: search, mode: 'insensitive' } },
-      {
-        brand: {
-          name: { contains: search, mode: 'insensitive' },
-        },
-      },
-      {
-        category: {
-          name: { contains: search, mode: 'insensitive' },
-        },
-      },
-      {
-        stock: {
-          warehouse: {
-            name: { contains: search, mode: 'insensitive' },
-          },
-        },
-      },
-    ],
-  }),
-  ...(lowStock && {
-    stock: {
-      current_quantity: {
-        lte: this.client.stocks.fields.minimium_quantity,
-      },
-    },
-  }),
-};
+  //   const { skip, totalItems, limit, totalPages, currentPage } =
+  //     await paginations({
+  //       client: this.client,
+  //       model: 'products',
+  //       pagination,
+  //       where,
+  //     });
 
-    const page = pagination?.page ?? 1;
-    const limit = pagination?.limit ?? 10;
-    const total = await this.client.products.count({ where });
-    const totalPages = Math.ceil(total / limit);
-    const skip = (page - 1) * limit;
+  //   const products = await this.client.products.findMany({
+  //     select: {
+  //       id: true,
+  //       url_imagem: true,
+  //       name: true,
+  //       description: true,
+  //       product_code: true,
+  //       sales_unit: true,
+  //       brand: { select: { name: true } },
+  //       category: { select: { name: true } },
+  //       is_active: true,
+  //       date_of_inactivation: true,
+  //       created_at: true,
+  //       updated_at: true,
+  //       stock: {
+  //         select: {
+  //           id: true,
+  //           warehouse_id: true,
+  //           current_quantity: true,
+  //           minimium_quantity: true,
+  //           maximum_quantity: true,
+  //           price: true,
+  //           purchase_price: true,
+  //           cost_price: true,
+  //           has_discount: true,
+  //           discount_percentage: true,
+  //           created_at: true,
+  //           updated_at: true,
+  //           warehouse: { select: { id: true, name: true } },
+  //         },
+  //       },
+  //     },
+  //     where,
+  //     orderBy,
+  //     skip,
+  //     take: limit,
+  //   });
 
-    const products = await this.client.products.findMany({
-      select: {
-        id: true,
-        url_imagem: true,
-        name: true,
-        description: true,
-        product_code: true,
-        sales_unit: true,
-        brand: { select: { name: true } },
-        category: {
-          select: { name: true },
-        },
-        is_active: true,
-        date_of_inactivation: true,
-        created_at: true,
-        updated_at: true,
-        stock: {
-          select: {
-            id: true,
-            warehouse_id: true,
-            current_quantity: true,
-            minimium_quantity: true,
-            maximum_quantity: true,
-            price: true,
-            purchase_price: true,
-            cost_price: true,
-            has_discount: true,
-            discount_percentage: true,
-            created_at: true,
-            updated_at: true,
-            warehouse: { select: { id: true, name: true } },
-          },
-        },
-      },
-      where,
-      orderBy,
-      skip,
-      take: limit,
-    });
+  //   if (products.length <= 0)
+  //     throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
 
-    if (products.length <= 0)
-      throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
+  //   const formatted = formatData<ItemsStock, FormattedStock>(
+  //     products as any,
+  //     fieldMap,
+  //   );
 
-    const formatted = products.map((item) => {
-      const formattedStock = item.stock
-        ? {
-            ...item.stock,
-            warehouse_name: item.stock.warehouse?.name ?? null,
-          }
-        : null;
-
-      if (formattedStock) delete (formattedStock as any).warehouse;
-
-      return {
-        ...item,
-        brand: item.brand?.name ?? null,
-        category: item.category?.name ?? null,
-        stock: formattedStock,
-      };
-    });
-
-    return {
-      formatted,
-      totalItems: total,
-      totalPages: totalPages,
-      currentPage: page,
-    };
-  }
+  //   return {
+  //     formatted,
+  //     totalItems,
+  //     totalPages,
+  //     currentPage,
+  //   };
+  // }
 
   async findOne(id: string) {
     const product = await this.client.products.findUnique({
@@ -335,7 +228,7 @@ export class StocksService {
             discount_percentage: true,
             created_at: true,
             updated_at: true,
-            warehouse: { select: { id: true, name: true } }, // aqui pegamos o nome do warehouse
+            warehouse: { select: { id: true, name: true } },
           },
         },
       },
@@ -344,76 +237,16 @@ export class StocksService {
     if (!product)
       throw new NotFoundException(ProductsMessages.PRODUCT_NOT_FOUND);
 
-    const formatted = {
-      ...product,
-      stock: product.stock
-        ? {
-            warehouse_id: product.stock.warehouse?.id ?? null,
-            warehouse_name: product.stock.warehouse?.name ?? null,
-            ...product.stock,
-          }
-        : null,
-    };
-
-    if (formatted.stock) {
-      delete (formatted.stock as any).warehouse;
-    }
+    const formatted = formatData<ItemsStock, FormattedStock>(
+      product as any,
+      fieldMap,
+    );
 
     return formatted;
   }
 
   async update(id: string, data: UpdateStockDto) {
-    await ensureUniqueField({
-      client: this.client,
-      model: 'products',
-      field: 'id',
-      id: true,
-      value: id,
-      msg: ProductsMessages.PRODUCT_NOT_FOUND,
-    });
-
-    if (data.stock_id) {
-      await ensureUniqueField({
-        client: this.client,
-        model: 'warehouses',
-        field: 'id',
-        id: true,
-        value: data.stock_id,
-        msg: WarehousesMessages.WAREHOUSE_NOT_FOUND,
-      });
-    }
-
-    if (data.brand_id) {
-      await ensureUniqueField({
-        client: this.client,
-        model: 'brands',
-        field: 'id',
-        id: true,
-        value: data.brand_id,
-        msg: BrandsMenssages.BRANDS_NOT_FOUND,
-      });
-    }
-
-    if (data.category_id) {
-      await ensureUniqueField({
-        client: this.client,
-        model: 'categories',
-        field: 'id',
-        id: true,
-        value: data.category_id,
-        msg: CategoriesMessages.CATEGORIES_NOT_FOUND,
-      });
-    }
-
-    if (data.product_code) {
-      await ensureUniqueField({
-        client: this.client,
-        model: 'products',
-        field: 'product_code',
-        value: data.product_code,
-        msg: ProductsMessages.BARCODE_ALREADY_REGISTERED,
-      });
-    }
+    await validateStockData({ client: this.client, data, isUpdate: true, id });
 
     const product = await this.client.products.update({
       where: { id },

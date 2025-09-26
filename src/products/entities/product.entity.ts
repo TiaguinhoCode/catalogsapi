@@ -1,1 +1,1 @@
-export class Product {}
+export class Stock {}

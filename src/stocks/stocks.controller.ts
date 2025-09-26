@@ -38,7 +38,7 @@ export class StocksController {
   async create(@Body() data: CreateStockDto) {
     return {
       msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Produto'),
-      product: await this.stocksService.create(data),
+      product: await this.stocksService.createStock(data),
     };
   }
 
@@ -46,7 +46,7 @@ export class StocksController {
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
   async findAll(@Query() paginationDto?: PaginationDto) {
-    const result = await this.stocksService.findAll(paginationDto);
+    const result = await this.stocksService.findAllStock(paginationDto);
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
@@ -57,43 +57,45 @@ export class StocksController {
     };
   }
 
-  @Get('filters')
-  @UseGuards(AuthGuard, RulesGuard)
-  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
-  async findProductFilter(
-    @Query('is_active') is_active?: string,
-    @Query('brands') brandsId?: string,
-    @Query('categories') categoriesId?: string,
-    @Query('warehouse') warehouseId?: string,
-    @Query('search') search?: string,
-    @Query('orderByStock') orderByStock?: 'asc' | 'desc',
-    @Query('lowStock') lowStock?: string,
-    @Query() paginationDto?: PaginationDto,
-  ) {
-    const isActiveParsed =
-      is_active === 'true' ? true : is_active === 'false' ? false : undefined;
-    const isLowStockParsed =
-      lowStock === 'true' ? true : is_active === 'false' ? false : undefined;
+  // @Get('filters')
+  // @UseGuards(AuthGuard, RulesGuard)
+  // @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
+  // async findProductFilter(
+  //   @Query('is_active') is_active?: string,
+  //   @Query('brands') brandsId?: string,
+  //   @Query('categories') categoriesId?: string,
+  //   @Query('warehouse') warehouseId?: string,
+  //   @Query('search') search?: string,
+  //   @Query('orderByStock') orderByStock?: 'asc' | 'desc',
+  //   @Query('lowStock') lowStock?: string,
+  //   @Query() paginationDto?: PaginationDto,
+  // ) {
+  //   const isActiveParsed =
+  //     is_active === 'true' ? true : is_active === 'false' ? false : undefined;
+  //   const isLowStockParsed =
+  //     lowStock === 'true' ? true : is_active === 'false' ? false : undefined;
 
-    const result = await this.stocksService.findAllProductsByFilters(
-      isActiveParsed,
-      brandsId,
-      categoriesId,
-      warehouseId,
-      search,
-      orderByStock,
-      isLowStockParsed,
-      paginationDto,
-    );
+  //   const result = await this.stocksService.findStockByFilter({
+  //     params: {
+  //       is_active: isActiveParsed,
+  //       brand_id: brandsId,
+  //       category_id: categoriesId,
+  //       stock: { warehouse_id: warehouseId },
+  //       search,
+  //       orderByStock,
+  //       lowStock: isLowStockParsed,
+  //     },
+  //     pagination: paginationDto,
+  //   });
 
-    return {
-      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      products: result.formatted,
-      totalItems: result.totalItems,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
-    };
-  }
+  //   return {
+  //     msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+  //     products: result.formatted,
+  //     totalItems: result.totalItems,
+  //     totalPages: result.totalPages,
+  //     currentPage: result.currentPage,
+  //   };
+  // }
 
   @Get(':id')
   @UseGuards(AuthGuard, RulesGuard)
