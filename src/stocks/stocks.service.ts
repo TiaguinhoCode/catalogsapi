@@ -186,48 +186,48 @@ export class StocksService {
     }
 
     const where: any = {
-  ...(is_active !== undefined && { is_active }),
-  ...(brandsId && {
-    brand_id: { in: brandsId.split(',') },
-  }),
-  ...(categoriesId && {
-    category_id: { in: categoriesId.split(',') },
-  }),
-  ...(warehouseId && {
-    stock: { warehouse_id: { in: warehouseId.split(',') } },
-  }),
-  ...(search && {
-    OR: [
-      { name: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } },
-      { product_code: { contains: search, mode: 'insensitive' } },
-      {
-        brand: {
-          name: { contains: search, mode: 'insensitive' },
-        },
-      },
-      {
-        category: {
-          name: { contains: search, mode: 'insensitive' },
-        },
-      },
-      {
+      ...(is_active !== undefined && { is_active }),
+      ...(brandsId && {
+        brand_id: { in: brandsId.split(',') },
+      }),
+      ...(categoriesId && {
+        category_id: { in: categoriesId.split(',') },
+      }),
+      ...(warehouseId && {
+        stock: { warehouse_id: { in: warehouseId.split(',') } },
+      }),
+      ...(search && {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { product_code: { contains: search, mode: 'insensitive' } },
+          {
+            brand: {
+              name: { contains: search, mode: 'insensitive' },
+            },
+          },
+          {
+            category: {
+              name: { contains: search, mode: 'insensitive' },
+            },
+          },
+          {
+            stock: {
+              warehouse: {
+                name: { contains: search, mode: 'insensitive' },
+              },
+            },
+          },
+        ],
+      }),
+      ...(lowStock && {
         stock: {
-          warehouse: {
-            name: { contains: search, mode: 'insensitive' },
+          current_quantity: {
+            lte: this.client.stocks.fields.minimium_quantity,
           },
         },
-      },
-    ],
-  }),
-  ...(lowStock && {
-    stock: {
-      current_quantity: {
-        lte: this.client.stocks.fields.minimium_quantity,
-      },
-    },
-  }),
-};
+      }),
+    };
 
     const page = pagination?.page ?? 1;
     const limit = pagination?.limit ?? 10;
@@ -301,6 +301,92 @@ export class StocksService {
       totalItems: total,
       totalPages: totalPages,
       currentPage: page,
+    };
+  }
+
+  async stockSummary(
+    is_active?: boolean,
+    brandsId?: string,
+    categoriesId?: string,
+    warehouseId?: string,
+    search?: string,
+  ) {
+    const where: any = {
+      ...(is_active !== undefined && { is_active }),
+      ...(brandsId && {
+        brand_id: { in: brandsId.split(',') },
+      }),
+      ...(categoriesId && {
+        category_id: { in: categoriesId.split(',') },
+      }),
+      ...(warehouseId && {
+        stock: { warehouse_id: { in: warehouseId.split(',') } },
+      }),
+      ...(search && {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { product_code: { contains: search, mode: 'insensitive' } },
+          {
+            brand: {
+              name: { contains: search, mode: 'insensitive' },
+            },
+          },
+          {
+            category: {
+              name: { contains: search, mode: 'insensitive' },
+            },
+          },
+          {
+            stock: {
+              warehouse: {
+                name: { contains: search, mode: 'insensitive' },
+              },
+            },
+          },
+        ],
+      }),
+    };
+
+    // Obtenha os IDs dos produtos que atendem aos critérios de pesquisa
+    const products = await this.client.products.findMany({
+      where,
+      select: {
+        id: true,
+        stock_id: true,
+      },
+    });
+
+    // Obtenha os dados de estoque correspondentes aos produtos encontrados
+    const stockData = await this.client.stocks.aggregate({
+      where: {
+        id: { in: products.map((p) => p.stock_id) },
+      },
+      _sum: {
+        current_quantity: true,
+        minimium_quantity: true,
+        maximum_quantity: true,
+        price: true,
+        purchase_price: true,
+        cost_price: true,
+      },
+    });
+
+    // Calcule os totais desejados
+    const totalProducts = products.length;
+    const totalStockMin = stockData._sum.minimium_quantity || 0;
+    const totalStockMax = stockData._sum.maximum_quantity || 0;
+    const totalCost =
+      stockData._sum.cost_price || 0 * stockData._sum.current_quantity || 0;
+    // const potentialProfit =
+    //   totalStockMax * (stockData._sum.price - stockData._sum.cost_price);
+
+    return {
+      totalProducts,
+      totalStockMin,
+      totalStockMax,
+      totalCost,
+      // potentialProfit,
     };
   }
 

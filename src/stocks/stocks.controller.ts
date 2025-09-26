@@ -95,6 +95,36 @@ export class StocksController {
     };
   }
 
+  @Get('filters/summary')
+  @UseGuards(AuthGuard, RulesGuard)
+  @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
+  async stockSummary(
+    @Query('is_active') is_active?: string,
+    @Query('brands') brandsId?: string,
+    @Query('categories') categoriesId?: string,
+    @Query('warehouse') warehouseId?: string,
+    @Query('search') search?: string,
+  ) {
+    const isActiveParsed =
+      is_active === 'true' ? true : is_active === 'false' ? false : undefined;
+
+    const result = await this.stocksService.stockSummary(
+      isActiveParsed,
+      brandsId,
+      categoriesId,
+      warehouseId,
+      search,
+    );
+
+    return {
+      msg: requestResponseMessages.SUCCESSFUL_REQUEST,
+      totalCost: result.totalCost,
+      totalProducts: result.totalProducts,
+      totalStockMax: result.totalStockMax,
+      totalStockMin: result.totalStockMin,
+    };
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard, RulesGuard)
   @Rules(rules.SUPORTE, rules.DONO, rules.ESTOQUE)
