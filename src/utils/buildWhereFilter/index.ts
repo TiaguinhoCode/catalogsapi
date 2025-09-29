@@ -13,17 +13,20 @@ export function buildWhereFilter(
 
   for (const [key, value] of Object.entries(filters)) {
     if (value === undefined || value === null) continue;
+
     if (typeof value === 'object' && !Array.isArray(value)) {
       where[key] = buildWhereFilter(model, value as FilterCondition);
     } else if (Array.isArray(value)) {
       where[key] = { in: value };
     } else if (typeof value === 'string') {
-      if (value.startsWith('%') && value.endsWith('%')) {
-        where[key] = { contains: value.slice(1, -1) };
-      } else if (value.startsWith('%')) {
-        where[key] = { endsWith: value.slice(1) };
-      } else if (value.endsWith('%')) {
-        where[key] = { startsWith: value.slice(0, -1) };
+      if (key === 'search') {
+        where.OR = [
+          { name: { contains: value, mode: 'insensitive' } },
+          { description: { contains: value, mode: 'insensitive' } },
+          { brand: { name: { contains: value, mode: 'insensitive' } } },
+          { category: { name: { contains: value, mode: 'insensitive' } } },
+          { product_code: { contains: value, mode: 'insensitive' } },
+        ];
       } else {
         where[key] = value;
       }

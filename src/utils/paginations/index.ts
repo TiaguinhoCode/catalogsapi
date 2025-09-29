@@ -2,7 +2,8 @@
 import { PrismaClient } from '@prisma/client';
 
 // Tipagem
-import { PaginationDto } from './../../pagination/dto/pagination.dto';
+// import { PaginationDto } from './../../pagination/dto/pagination.dto';
+import { PaginationDto } from './../../modules/pagination/dto/pagination.dto';
 
 type PaginationResult = {
   skip: number;
