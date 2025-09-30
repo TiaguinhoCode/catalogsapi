@@ -9,12 +9,14 @@ import { JwtService } from '@nestjs/jwt';
 // Bibliotecas
 import { compare } from 'bcrypt';
 
+// Utils
+import { UserMessages } from './../../../utils/common/messages/user.messages';
+
 // Service
 import { PrismaService } from './../../../database/prisma.service';
 
 // Tipagem
 import { AuthDto } from './dto/auth.dto';
-import { UserMessages } from './../../../utils/common/messages/user.messages';
 
 @Injectable()
 export class AuthService {
