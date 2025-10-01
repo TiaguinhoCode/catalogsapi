@@ -8,18 +8,18 @@ import { AppController } from './app.controller';
 import { DatabaseModule } from './database/database.module';
 
 // Modulo
-import { RulesModule } from './rules/rules.module';
-import { CompaniesModule } from './companies/companies.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './users/auth/auth.module';
+import { RulesModule } from './modules/rules/rules.module';
+import { CompaniesModule } from './modules/companies/companies.module';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/users/auth/auth.module';
 
 // Service
-import { MailService } from './mail/mail.service';
-import { WarehousesModule } from './warehouses/warehouses.module';
-import { BrandsModule } from './brands/brands.module';
-import { CategoriesModule } from './categories/categories.module';
-import { ProductsModule } from './products/products.module';
-import { StocksModule } from './stocks/stocks.module';
+import { MailService } from './modules/mail/mail.service';
+import { WarehousesModule } from './modules/warehouses/warehouses.module';
+import { BrandsModule } from './modules/brands/brands.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { ProductsModule } from './modules/products/products.module';
+import { StocksModule } from './modules/stocks/stocks.module';
 
 @Module({
   imports: [
