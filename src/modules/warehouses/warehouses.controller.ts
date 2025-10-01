@@ -50,10 +50,10 @@ export class WarehousesController {
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      warehouses: result.warehouse,
-      totalItems: result.totalItems,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
+      warehouses: (result as any).warehouses,
+      totalItems: (result as any).totalItems,
+      totalPages: (result as any).totalPages,
+      currentPage: (result as any).currentPage,
     };
   }
 
@@ -65,7 +65,7 @@ export class WarehousesController {
     @Query('search') search?: string,
     @Query() paginationDto?: PaginationDto,
   ) {
-    const result = await this.warehousesService.findAllWarehousesByFilter(
+    const result = await this.warehousesService.findPerFilter(
       is_active,
       search,
       paginationDto,
@@ -73,10 +73,10 @@ export class WarehousesController {
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      warehouses: result.warehouse,
-      totalItems: result.totalItems,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
+      warehouses: (result as any).warehouses,
+      totalItems: (result as any).totalItems,
+      totalPages: (result as any).totalPages,
+      currentPage: (result as any).currentPage,
     };
   }
 

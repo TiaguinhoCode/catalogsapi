@@ -26,7 +26,11 @@ export class WarehousesService {
   }
 
   async findAll(pagination?: PaginationDto) {
-    return listWarehouse({ client: this.client, pagination });
+    return listWarehouse({
+      client: this.client,
+      pagination,
+      is_active: 'true',
+    });
   }
 
   async findPerFilter(

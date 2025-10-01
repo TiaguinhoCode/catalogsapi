@@ -1,12 +1,14 @@
 // Nest
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 // Service
 import { PrismaService } from './../../database/prisma.service';
 
 // Utils
-import { ensureUniqueField } from './../../utils/fieldValidation/validation';
-import { CategoriesMessages } from './../../utils/common/messages/categories.menssages';
+import { createCategories } from './services/create.categories.service';
+import { listCategories } from './services/list.categories.service';
+import { updateCategories } from './services/update.categories.service';
+import { removeCategories } from './services/remove.categories.service';
 
 // Tipagem
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -17,113 +19,27 @@ import { PaginationDto } from './../pagination/dto/pagination.dto';
 export class CategoriesService {
   constructor(private readonly client: PrismaService) {}
 
-  async createCategories(data: CreateCategoryDto) {
-    await ensureUniqueField({
-      client: this.client,
-      model: 'categories',
-      field: 'name',
-      value: data.name.toLowerCase(),
-      msg: CategoriesMessages.CATEGORIES_ALREADY_HAS_REGISTRATION,
-    });
-
-    const category = await this.client.categories.create({ data });
-
-    return category;
+  async create(data: CreateCategoryDto) {
+    return createCategories({ client: this.client, data });
   }
 
   async findAll(pagination?: PaginationDto) {
-    const page = pagination?.page ?? 1;
-    const limit = pagination?.limit ?? 10;
-    const total = await this.client.categories.count();
-    const totalPages = Math.ceil(total / limit);
-    const skip = (page - 1) * limit;
-
-    const categories = await this.client.categories.findMany({
-      skip,
-      take: limit,
-    });
-
-    if (!categories)
-      throw new NotFoundException(CategoriesMessages.CATEGORIES_NOT_FOUND);
-
-    return {
-      categories,
-      totalItems: total,
-      totalPages: totalPages,
-      currentPage: page,
-    };
+    return listCategories({ client: this.client, pagination });
   }
 
-  async findAllCategories(search?: string, pagination?: PaginationDto) {
-    const page = pagination?.page ?? 1;
-    const limit = pagination?.limit ?? 10;
-    const total = await this.client.categories.count({
-      where: { name: { contains: search, mode: 'insensitive' } },
-    });
-    const totalPages = Math.ceil(total / limit);
-    const skip = (page - 1) * limit;
-
-    const categories = await this.client.categories.findMany({
-      where: { name: { contains: search, mode: 'insensitive' } },
-      skip,
-      take: limit,
-    });
-
-    if (categories.length <= 0) {
-      throw new NotFoundException(CategoriesMessages.CATEGORIES_NOT_FOUND);
-    }
-
-    return {
-      categories,
-      totalItems: total,
-      totalPages: totalPages,
-      currentPage: page,
-    };
+  async findPerFilter(search?: string, pagination?: PaginationDto) {
+    return listCategories({ client: this.client, search, pagination });
   }
 
-  async findOne(id: string) {
-    const category = await ensureUniqueField({
-      client: this.client,
-      model: 'categories',
-      field: 'id',
-      id: true,
-      value: id,
-      msg: CategoriesMessages.CATEGORIES_NOT_FOUND,
-    });
-
-    return category;
+  async findPerId(id: string) {
+    return listCategories({ client: this.client, id });
   }
 
   async update(id: string, data: UpdateCategoryDto) {
-    await ensureUniqueField({
-      client: this.client,
-      model: 'categories',
-      field: 'id',
-      id: true,
-      value: id,
-      msg: CategoriesMessages.CATEGORIES_NOT_FOUND,
-    });
-
-    const category = await this.client.categories.update({
-      where: { id },
-      data,
-    });
-
-    return category;
+    return updateCategories({ client: this.client, id, data });
   }
 
   async remove(id: string) {
-    await ensureUniqueField({
-      client: this.client,
-      model: 'categories',
-      field: 'id',
-      id: true,
-      value: id,
-      msg: CategoriesMessages.CATEGORIES_NOT_FOUND,
-    });
-
-    const category = await this.client.categories.delete({ where: { id } });
-
-    return category;
+    return removeCategories({ client: this.client, id });
   }
 }

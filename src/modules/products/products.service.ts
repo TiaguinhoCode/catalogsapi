@@ -17,7 +17,7 @@ export class ProductsService {
     return listProducts({ client: this.client, pagination });
   }
 
-  async findAllProductsByFilter({
+  async findPerFilter({
     params,
     pagination,
   }: {

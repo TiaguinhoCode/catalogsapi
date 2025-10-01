@@ -32,17 +32,23 @@ export class ProductsController {
     @Query('search') search?: string,
     @Query() paginationDto?: PaginationDto,
   ) {
-    const result = await this.productsService.findAllProductsByFilter({
-      params: {is_active: true, stock: {warehouse_name: ''}, brandsId, categoriesId, search },
+    const result = await this.productsService.findPerFilter({
+      params: {
+        is_active: true,
+        stock: { warehouse_name: 'Estoque Online' },
+        brandsId,
+        categoriesId,
+        search,
+      },
       pagination: paginationDto,
     });
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      products: result.formatted,
-      totalItems: result.totalItems,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
+      products: (result as any).formatted,
+      totalItems: (result as any).totalItems,
+      totalPages: (result as any).totalPages,
+      currentPage: (result as any).currentPage,
     };
   }
 

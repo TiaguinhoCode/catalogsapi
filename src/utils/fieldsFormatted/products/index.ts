@@ -1,14 +1,65 @@
-export const fielMap = {
-  id: (value: any) => value,
-  url_imagem: (value: any) => value,
-  name: (value: any) => value,
-  description: (value: any) => value,
-  brand_id: (value: any) => value ?? null,
-  brand: (value: any) => value?.name ?? null,
-  category_id: (value: any) => value ?? null,
-  category: (value: any) => value?.name ?? null,
-  price: (value: any) => value?.stock.price ?? null,
-  current_quantity: (value: any) => value?.stock.current_quantity ?? null,
-  has_discount: (value: any) => value?.stock.has_discount ?? null,
-  discount_percentage: (value: any) => value?.stock.discount_percentage ?? null,
+export const fieldMap = {
+  id: (value: any, item: any) => {
+    return value ?? item.id;
+  },
+  url_imagem: (value: any, item: any) => {
+    return value ?? item.url_imagem;
+  },
+  name: (value: any, item: any) => {
+    return value ?? item.name;
+  },
+  description: (value: any, item: any) => {
+    return value ?? item.description;
+  },
+  brand_id: (value: any, item: any) => {
+    return value ?? item.brand?.id ?? null;
+  },
+  brand: (value: any, item: any) => {
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    if (value && typeof value === 'object' && 'name' in value) {
+      return (value as any).name;
+    }
+    return item.brand?.name ?? null;
+  },
+  category_id: (value: any, item: any) => {
+    return value ?? item.category?.id ?? null;
+  },
+  category: (value: any, item: any) => {
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    if (value && typeof value === 'object' && 'name' in value) {
+      return (value as any).name;
+    }
+
+    return value ?? item.category?.name ?? null;
+  },
+  price: (value: any, item: any) => {
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+    return item.stock?.price ?? null;
+  },
+  current_quantity: (value: any, item: any) => {
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+    return item.stock?.current_quantity ?? null;
+  },
+  has_discount: (value: any, item: any) => {
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+    return item.stock?.has_discount ?? null;
+  },
+  discount_percentage: (value: any, item: any) => {
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+    return item.stock?.discount_percentage ?? null;
+  },
 };

@@ -38,20 +38,20 @@ export class BrandsController {
   async create(@Body() data: CreateBrandDto) {
     return {
       msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Marcas'),
-      brand: await this.brandsService.createBrands(data),
+      brand: await this.brandsService.create(data),
     };
   }
 
   @Get()
   async findAll(@Query() PaginationDto?: PaginationDto) {
-    const result = await this.brandsService.findAllBrands(PaginationDto);
+    const result = await this.brandsService.findAll(PaginationDto);
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      brands: result.brands,
-      totalItems: result.totalItems,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
+      brands: (result as any).brands,
+      totalItems: (result as any).totalItems,
+      totalPages: (result as any).totalPages,
+      currentPage: (result as any).currentPage,
     };
   }
 
@@ -60,17 +60,17 @@ export class BrandsController {
     @Query('search') search?: string,
     @Query() paginationDto?: PaginationDto,
   ) {
-    const result = await this.brandsService.findBrandByFilter({
+    const result = await this.brandsService.findPerFilter({
       search,
       pagination: paginationDto,
     });
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      brands: result.brands,
-      totalItems: result.totalItems,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
+      brands: (result as any).brands,
+      totalItems: (result as any).totalItems,
+      totalPages: (result as any).totalPages,
+      currentPage: (result as any).currentPage,
     };
   }
 
@@ -88,7 +88,7 @@ export class BrandsController {
   async update(@Param('id') id: string, @Body() data: UpdateBrandDto) {
     return {
       msg: requestResponseMessages.CHANGE_REQUEST('Marcas'),
-      brand: await this.brandsService.updateBrand({ id, data }),
+      brand: await this.brandsService.update({ id, data }),
     };
   }
 
@@ -98,7 +98,7 @@ export class BrandsController {
   async remove(@Param('id') id: string) {
     return {
       msg: requestResponseMessages.REMOVAL_REQUEST('Marcas'),
-      brand: await this.brandsService.removeBrand(id),
+      brand: await this.brandsService.remove(id),
     };
   }
 }

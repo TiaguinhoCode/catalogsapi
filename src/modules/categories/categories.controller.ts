@@ -38,36 +38,39 @@ export class CategoriesController {
   async create(@Body() createCategoryDto: CreateCategoryDto) {
     return {
       msg: requestResponseMessages.SUCCESSFUL_CREATION_REQUEST('Categoria'),
-      category: await this.categoriesService.createCategories(createCategoryDto),
+      category: await this.categoriesService.create(createCategoryDto),
     };
   }
 
   @Get()
   async findAll(@Query() paginationDto?: PaginationDto) {
-    const result = await this.categoriesService.findAll(paginationDto);
+    const resp = await this.categoriesService.findAll(paginationDto);
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      categories: result.categories,
-      totalItems: result.totalItems,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
+      categories: (resp as any).categories,
+      totalItems: (resp as any).totalItems,
+      totalPages: (resp as any).totalPages,
+      currentPage: (resp as any).currentPage,
     };
   }
 
   @Get('filter')
-  async findAllCategories(
+  async findPerFilter(
     @Query('search') search?: string,
     @Query() paginationDto?: PaginationDto,
   ) {
-    const result = await this.categoriesService.findAllCategories(search, paginationDto);
+    const resp = await this.categoriesService.findPerFilter(
+      search,
+      paginationDto,
+    );
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      categories: result.categories,
-      totalItems: result.totalItems,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
+      categories: (resp as any).categories,
+      totalItems: (resp as any).totalItems,
+      totalPages: (resp as any).totalPages,
+      currentPage: (resp as any).currentPage,
     };
   }
 
@@ -75,7 +78,7 @@ export class CategoriesController {
   async findOne(@Param('id') id: string) {
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      category: await this.categoriesService.findOne(id),
+      category: await this.categoriesService.findPerId(id),
     };
   }
 

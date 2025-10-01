@@ -20,13 +20,22 @@ export function buildWhereFilter(
       where[key] = { in: value };
     } else if (typeof value === 'string') {
       if (key === 'search') {
-        where.OR = [
-          { name: { contains: value, mode: 'insensitive' } },
-          { description: { contains: value, mode: 'insensitive' } },
-          { brand: { name: { contains: value, mode: 'insensitive' } } },
-          { category: { name: { contains: value, mode: 'insensitive' } } },
-          { product_code: { contains: value, mode: 'insensitive' } },
-        ];
+        if (model === 'products') {
+          where.OR = [
+            { name: { contains: value, mode: 'insensitive' } },
+            { description: { contains: value, mode: 'insensitive' } },
+            { brand: { name: { contains: value, mode: 'insensitive' } } },
+            { category: { name: { contains: value, mode: 'insensitive' } } },
+            { product_code: { contains: value, mode: 'insensitive' } },
+            {
+              stock: {
+                warehouse_name: { contains: value, mode: 'insensitive' },
+              },
+            },
+          ];
+        } else {
+          where.OR = [{ name: { contains: value, mode: 'insensitive' } }];
+        }
       } else {
         where[key] = value;
       }

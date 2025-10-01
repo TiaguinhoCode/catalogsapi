@@ -1,6 +1,7 @@
 // Utils
-import { paginations } from './../../../utils/paginations';
 import { WarehousesMessages } from './../../../utils/common/messages/warehouses.menssages';
+import { buildWhereFilter } from './../../../utils/buildWhereFilter/index';
+import { paginations } from './../../../utils/paginations';
 
 // Nest
 import { NotFoundException } from '@nestjs/common';
@@ -8,7 +9,6 @@ import { NotFoundException } from '@nestjs/common';
 // Tipagem
 import { PaginationDto } from './../../../modules/pagination/dto/pagination.dto';
 import { PrismaService } from './../../../database/prisma.service';
-import { buildWhereFilter } from './../../../utils/buildWhereFilter/index';
 interface ListWarehouseProps {
   client: PrismaService;
   id?: string;
@@ -26,28 +26,25 @@ export async function listWarehouse({
 }: ListWarehouseProps) {
   if (!id) {
     const { skip, limit, totalItems, totalPages, currentPage } =
-      await this.paginationService.paginate('warehouses', pagination);
-const params: Record<string, any> = {
-      is_active: is_active === 'true' ? true : false,
-      search,
-    };
+      await paginations({ client, model: 'warehouses', pagination });
 
     const params: Record<string, any> = {
       is_active: is_active === 'true' ? true : false,
       search,
     };
+
     const where = params ? buildWhereFilter('warehouses', params) : undefined;
-    const warehouse = await client.warehouses.findMany({
+    console.log('filtro: ', where);
+    const warehouses = await client.warehouses.findMany({
       where,
       skip,
       take: limit,
     });
-
-    if (warehouse.length <= 0)
+    if (warehouses.length <= 0)
       throw new NotFoundException(WarehousesMessages.WAREHOUSE_NOT_FOUND);
 
     return {
-      warehouse,
+      warehouses,
       totalItems,
       totalPages,
       currentPage,
