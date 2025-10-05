@@ -103,11 +103,15 @@ export class StocksController {
     const isActiveParsed =
       is_active === 'true' ? true : is_active === 'false' ? false : undefined;
 
-    // const resp = await this.stocksService.summary();
-
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      stock: this.stocksService.summary()
+      stock: await this.stocksService.summary({
+        is_active: isActiveParsed,
+        brand_id: brandsId,
+        category_id: categoriesId,
+        stock: { warehouse_id: warehouseId },
+        search,
+      }),
     };
   }
 

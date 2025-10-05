@@ -44,8 +44,8 @@ export class StocksService {
     });
   }
 
-  async summary() {
-    return summaryStock({ client: this.client });
+  async summary(params: filterParams) {
+    return summaryStock({ client: this.client, params });
   }
 
   async findPeerId(id: string) {
