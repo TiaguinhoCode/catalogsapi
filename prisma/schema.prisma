@@ -113,6 +113,7 @@ model Products {
   brand    Brands        @relation(fields: [brand_id], references: [id])
   stock    Stocks        @relation(fields: [stock_id], references: [id], onDelete: Cascade)
   category Categories    @relation(fields: [category_id], references: [id])
+  banners  Banners[]
   supliers Suppliers[]   @relation("ProductsToSuppliers")
 
   @@map("products")
@@ -126,6 +127,18 @@ model Brands {
   Products   Products[]
 
   @@map("brands")
+}
+
+model Banners {
+  id         String    @id @default(uuid())
+  url_imagem String
+  product_id String    @unique
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+
+  products Products @relation(fields: [product_id], references: [id])
+
+  @@map("banners")
 }
 
 model Categories {
