@@ -104,7 +104,6 @@ model Products {
   description          String?
   sales_unit           String
   is_active            Boolean   @default(true)
-  url_imagem           String?
   date_of_inactivation DateTime?
   created_at           DateTime? @default(now())
   updated_at           DateTime? @updatedAt
@@ -130,13 +129,14 @@ model Brands {
 }
 
 model Banners {
-  id         String    @id @default(uuid())
-  url_imagem String
-  product_id String    @unique
-  created_at DateTime  @default(now())
-  updated_at DateTime? @updatedAt
+  id            String    @id @default(uuid())
+  url_imagem    String
+  display_order Int?      @unique
+  product_id    String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime? @updatedAt
 
-  products Products @relation(fields: [product_id], references: [id])
+  products Products? @relation(fields: [product_id], references: [id])
 
   @@map("banners")
 }

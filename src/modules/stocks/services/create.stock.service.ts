@@ -16,7 +16,7 @@ export async function createStock({
 }) {
   await validateStockData({ client, data });
 
-  const product = await this.client.stocks.create({
+  const product = await client.stocks.create({
     data: {
       warehouse_id: data.stock_id,
       current_quantity: data.current_quantity,
@@ -35,11 +35,17 @@ export async function createStock({
           product_code: data.product_code,
           description: data.description,
           sales_unit: data.sales_unit,
-          url_imagem: data.url_imagem,
+          banners: {
+            createMany: {
+              data: data.banners.map((item) => ({
+                url_imagem: item.url_imagem,
+              })),
+            },
+          },
         },
       },
     },
-    select: { Products: true },
+    select: { Products: { include: { banners: true } } },
   });
 
   return product.Products;

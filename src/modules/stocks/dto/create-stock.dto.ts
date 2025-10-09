@@ -5,6 +5,9 @@ export class CreateStockDto {
   @IsNotEmpty({ message: 'Nome não pode estar vazio' })
   name: string;
 
+  @IsOptional()
+  banners: [{ id?: string; url_imagem: string }];
+
   @IsNotEmpty({ message: 'Estoque não pode estar vazio' })
   stock_id: string;
 
@@ -25,9 +28,6 @@ export class CreateStockDto {
 
   @IsOptional()
   is_active: boolean;
-
-  @IsOptional()
-  url_imagem: string;
 
   @IsOptional()
   date_of_inactivation: Date;
