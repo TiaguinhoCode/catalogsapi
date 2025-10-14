@@ -1,5 +1,4 @@
 // Utils
-import { paginations } from './../../../utils/paginations';
 import { BannersMessages } from './../../../utils/common/messages/banners.menssages';
 
 // Tipagem
