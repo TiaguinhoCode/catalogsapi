@@ -24,7 +24,7 @@ export async function validateStockData({
 }: ValidadeStockDataProps) {
   if (isUpdate) {
     await ensureUniqueField({
-      client: this.client,
+      client,
       model: 'products',
       field: 'id',
       id: true,
@@ -35,7 +35,7 @@ export async function validateStockData({
 
   if (isUpdate && data.stock_id) {
     await ensureUniqueField({
-      client: this.client,
+      client,
       model: 'warehouses',
       field: 'id',
       id: true,
@@ -46,7 +46,7 @@ export async function validateStockData({
 
   if (isUpdate && data.category_id) {
     await ensureUniqueField({
-      client: this.client,
+      client,
       model: 'categories',
       field: 'id',
       id: true,
@@ -57,7 +57,7 @@ export async function validateStockData({
 
   if (isUpdate && data.brand_id) {
     await ensureUniqueField({
-      client: this.client,
+      client,
       model: 'brands',
       field: 'id',
       id: true,
@@ -66,9 +66,9 @@ export async function validateStockData({
     });
   }
 
-  if (isUpdate && data.product_code) {
+  if (data.product_code) {
     await ensureUniqueField({
-      client: this.client,
+      client,
       model: 'products',
       field: 'product_code',
       value: data.product_code,
@@ -76,13 +76,15 @@ export async function validateStockData({
     });
   }
 
-  await ensureUniqueField({
-    client,
-    model: 'products',
-    field: 'name',
-    value: (data as any).name.toLowerCase(),
-    msg: ProductsMessages.PRODUCT_ALREADY_HAS_REGISTRATION,
-  });
+  if (!isUpdate)
+    await ensureUniqueField({
+      client,
+      model: 'products',
+      field: 'name',
+      value: (data as any).name.toLowerCase(),
+      msg: ProductsMessages.PRODUCT_ALREADY_HAS_REGISTRATION,
+    });
+
   await ensureUniqueField({
     client,
     model: 'warehouses',
@@ -106,12 +108,5 @@ export async function validateStockData({
     id: true,
     value: data.category_id,
     msg: CategoriesMessages.CATEGORIES_NOT_FOUND,
-  });
-  await ensureUniqueField({
-    client,
-    model: 'products',
-    field: 'product_code',
-    value: data.product_code,
-    msg: ProductsMessages.BARCODE_ALREADY_REGISTERED,
   });
 }

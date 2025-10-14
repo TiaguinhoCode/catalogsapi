@@ -26,7 +26,6 @@ interface ListStockServiceProps {
 
 const productSelect = {
   id: true,
-  url_imagem: true,
   name: true,
   description: true,
   product_code: true,
@@ -35,8 +34,13 @@ const productSelect = {
   category: { select: { id: true, name: true } },
   is_active: true,
   date_of_inactivation: true,
-  created_at: true,
-  updated_at: true,
+  banners: {
+    orderBy: { display_order: 'asc' as const },
+    select: {
+      id: true,
+      url_imagem: true,
+    },
+  },
   stock: {
     select: {
       id: true,

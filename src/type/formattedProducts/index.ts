@@ -9,8 +9,10 @@ export type ItemsStock = {
   category: string | null;
   is_active: boolean;
   date_of_inactivation: Date | null;
-  created_at: Date;
-  updated_at: Date;
+  banners: {
+    id: string;
+    url_imagem: string | null;
+  };
   stock: {
     id: string;
     warehouse_id: string;
@@ -26,6 +28,8 @@ export type ItemsStock = {
     updated_at: Date;
     warehouse_name: string | null;
   };
+  created_at: Date;
+  updated_at: Date;
 };
 
 export type FormattedStock = {

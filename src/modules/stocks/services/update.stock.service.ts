@@ -17,12 +17,11 @@ export async function updateStock({
   id,
   data,
 }: UpdateStockServiceProps) {
-  await validateStockData({ client: client, data, isUpdate: true, id });
+  await validateStockData({ client, data, isUpdate: true, id });
 
   const product = await client.products.update({
     where: { id },
     data: {
-      url_imagem: data.url_imagem,
       name: data.name,
       description: data.description,
       product_code: data.product_code,

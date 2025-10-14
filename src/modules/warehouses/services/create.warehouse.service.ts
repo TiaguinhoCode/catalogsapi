@@ -12,14 +12,14 @@ interface CreateWarehouseProps {
 
 export async function createWarehouse({ data, client }: CreateWarehouseProps) {
   await ensureUniqueField({
-    client: this.client,
-    model: 'Warehouses',
+    client,
+    model: 'warehouses',
     field: 'name',
     value: data.name.toLowerCase(),
     msg: WarehousesMessages.WAREHOUSE_ALREADY_REGISTERED,
   });
 
-  const warehouse = await this.client.warehouses.create({
+  const warehouse = await client.warehouses.create({
     data,
   });
 

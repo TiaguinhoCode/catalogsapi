@@ -1,6 +1,6 @@
 export const fieldMap = {
   id: (value: any) => value,
-  url_imagem: (value: any) => value,
+  banners: (value: any) => value,
   name: (value: any) => value,
   description: (value: any) => value,
   product_code: (value: any) => value,
@@ -9,8 +9,6 @@ export const fieldMap = {
   category: (value: any) => value?.name ?? null,
   is_active: (value: any) => value,
   date_of_inactivation: (value: any) => value,
-  created_at: (value: any) => value,
-  updated_at: (value: any) => value,
   stock: (value: any) =>
     value
       ? {
@@ -29,4 +27,6 @@ export const fieldMap = {
           warehouse_name: value.warehouse?.name ?? null,
         }
       : null,
+  created_at: (value: any) => value,
+  updated_at: (value: any) => value,
 };
