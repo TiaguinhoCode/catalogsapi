@@ -86,7 +86,7 @@ export class StocksController {
 
     return {
       msg: requestResponseMessages.SUCCESSFUL_REQUEST,
-      product: (result as any).formatted,
+      products: (result as any).formatted,
     };
   }
 
