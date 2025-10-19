@@ -20,6 +20,7 @@ import { BrandsModule } from './modules/brands/brands.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ProductsModule } from './modules/products/products.module';
 import { StocksModule } from './modules/stocks/stocks.module';
+import { ChatsModule } from './modules/chats/chats.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { StocksModule } from './modules/stocks/stocks.module';
     CategoriesModule,
     ProductsModule,
     StocksModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [MailService],
