@@ -1,2 +1,3 @@
-2025/10/22-10:54:37.328 51108 Creating DB /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/shared_proto_db since it was missing.
-2025/10/22-10:54:37.334 51108 Reusing MANIFEST /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/shared_proto_db/MANIFEST-000001
+2025/10/22-14:11:55.942 e41d Reusing MANIFEST /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/shared_proto_db/MANIFEST-000001
+2025/10/22-14:11:55.943 e41d Recovering log #3
+2025/10/22-14:11:55.944 e41d Reusing old log /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/shared_proto_db/000003.log 

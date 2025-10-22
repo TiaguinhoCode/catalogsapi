@@ -1,2 +1,3 @@
-2025/10/22-10:54:37.171 51113 Creating DB /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Site Characteristics Database since it was missing.
-2025/10/22-10:54:37.181 51113 Reusing MANIFEST /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Site Characteristics Database/MANIFEST-000001
+2025/10/22-14:11:55.550 e422 Reusing MANIFEST /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Site Characteristics Database/MANIFEST-000001
+2025/10/22-14:11:55.571 e422 Recovering log #3
+2025/10/22-14:11:55.571 e422 Reusing old log /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Site Characteristics Database/000003.log 
