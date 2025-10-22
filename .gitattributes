@@ -1,1 +1,2 @@
+*.db filter=lfs diff=lfs merge=lfs -text
 tokens/default-session/Default/Cache/Cache_Data/sqldb filter=lfs diff=lfs merge=lfs -text
