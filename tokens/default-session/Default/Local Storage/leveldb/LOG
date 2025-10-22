@@ -1,3 +1,6 @@
-2025/10/19-19:42:23.193 f8352 Reusing MANIFEST /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Local Storage/leveldb/MANIFEST-000001
-2025/10/19-19:42:23.199 f8352 Recovering log #23
-2025/10/19-19:42:23.200 f8352 Reusing old log /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Local Storage/leveldb/000023.log 
+2025/10/22-10:17:41.320 41a14 Reusing MANIFEST /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Local Storage/leveldb/MANIFEST-000001
+2025/10/22-10:17:41.326 41a14 Recovering log #32
+2025/10/22-10:17:41.327 41a14 Reusing old log /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Local Storage/leveldb/000032.log 
+2025/10/22-10:18:41.330 41a19 Level-0 table #37: started
+2025/10/22-10:18:41.333 41a19 Level-0 table #37: 14915 bytes OK
+2025/10/22-10:18:41.337 41a19 Delete type=0 #32

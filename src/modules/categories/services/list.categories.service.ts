@@ -1,6 +1,7 @@
 // Utils
 import { paginations } from './../../../utils/paginations';
 import { CategoriesMessages } from './../../../utils/common/messages/categories.menssages';
+import { buildWhereFilter } from './../../../utils/buildWhereFilter/index';
 
 // Nest
 import { NotFoundException } from '@nestjs/common';
@@ -8,7 +9,6 @@ import { NotFoundException } from '@nestjs/common';
 // Tipagem
 import { PaginationDto } from './../../pagination/dto/pagination.dto';
 import { PrismaService } from './../../../database/prisma.service';
-import { buildWhereFilter } from './../../../utils/buildWhereFilter/index';
 interface ListCategoriesProps {
   client: PrismaService;
   id?: string;
