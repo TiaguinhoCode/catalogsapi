@@ -35,9 +35,9 @@ export class ProductsController {
     const result = await this.productsService.findPerFilter({
       params: {
         is_active: true,
-        stock: { warehouse_name: 'Estoque Online' },
-        brandsId,
-        categoriesId,
+        'stock.warehouse.name': 'Estoque Online',
+        brand_id: brandsId,
+        category_id: categoriesId,
         search,
       },
       pagination: paginationDto,

@@ -27,7 +27,13 @@ const productSelect = {
   brand: { select: { name: true } },
   category_id: true,
   category: { select: { name: true } },
-  url_imagem: true,
+  banners: {
+    orderBy: { display_order: 'asc' as const },
+    select: {
+      id: true,
+      url_imagem: true,
+    },
+  },
   stock: {
     select: {
       price: true,
@@ -73,6 +79,7 @@ export async function listProducts({
     });
 
   const where = params ? buildWhereFilter('products', params) : undefined;
+  console.log('Filtro: ', where);
   const products = await client.products.findMany({
     select: productSelect,
     where,

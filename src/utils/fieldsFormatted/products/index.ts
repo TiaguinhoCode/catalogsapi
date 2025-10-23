@@ -2,9 +2,7 @@ export const fieldMap = {
   id: (value: any, item: any) => {
     return value ?? item.id;
   },
-  url_imagem: (value: any, item: any) => {
-    return value ?? item.url_imagem;
-  },
+  banners: (value: any) => value,
   name: (value: any, item: any) => {
     return value ?? item.name;
   },
