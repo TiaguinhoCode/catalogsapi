@@ -1,5 +1,5 @@
 export interface InitSessionResult {
-  qr?: string; // base64 ou URL do QR
-  status: 'initialized' | 'connected' | 'error';
+  status: 'connected' | 'error' | 'initialized' | 'pending' | 'loading';
+  qr?: string;
   message?: string;
 }
