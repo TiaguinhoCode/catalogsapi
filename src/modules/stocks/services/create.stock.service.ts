@@ -16,17 +16,34 @@ export async function createStock({
 }) {
   await validateStockData({ client, data });
 
+  const bannersArr: string[] = (() => {
+    if (!data.banners) return [];
+    if (typeof data.banners === 'string') {
+      return data.banners
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+    if (Array.isArray(data.banners)) {
+      return data.banners.map(String).filter(Boolean);
+    }
+    return [];
+  })();
+
   const product = await client.stocks.create({
     data: {
-      warehouse_id: data.stock_id,
+      // seu Stocks model tem warehouse_id — você estava usando data.stock_id antes
+      warehouse_id: data.stock_id, // verifique se 'data.stock_id' é o id do warehouse
       current_quantity: data.current_quantity,
       minimium_quantity: data.minimium_quantity,
       maximum_quantity: data.maximum_quantity,
       price: data.price,
       purchase_price: data.purchase_price,
       cost_price: data.cost_price,
-      has_discount: data.has_discount && data.has_discount,
-      discount_percentage: data.has_discount ? data.discount_percentage : null,
+      has_discount: !!data.has_discount,
+      discount_percentage: data.has_discount
+        ? (data.discount_percentage ?? null)
+        : null,
       Products: {
         create: {
           name: data.name,
@@ -35,17 +52,28 @@ export async function createStock({
           product_code: data.product_code,
           description: data.description,
           sales_unit: data.sales_unit,
-          banners: {
-            createMany: {
-              data: data.banners.map((item) => ({
-                url_imagem: item.url_imagem,
-              })),
-            },
-          },
+          // cria banners em nested create (array de objetos com url_imagem)
+          ...(bannersArr.length > 0
+            ? {
+                banners: {
+                  create: bannersArr.map((url) => ({
+                    url_imagem: url,
+                    // display_order não definido aqui — Prisma preencherá null ou use lógica para setar ordem
+                  })),
+                },
+              }
+            : {}),
         },
       },
     },
-    select: { Products: { include: { banners: true } } },
+    // selecione o que quiser retornar — aqui retorna o product com banners
+    select: {
+      Products: {
+        include: {
+          banners: true,
+        },
+      },
+    },
   });
 
   return product.Products;

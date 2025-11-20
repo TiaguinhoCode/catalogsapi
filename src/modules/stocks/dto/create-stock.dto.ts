@@ -1,12 +1,13 @@
 // Nest
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateStockDto {
   @IsNotEmpty({ message: 'Nome não pode estar vazio' })
   name: string;
 
   @IsOptional()
-  banners: [{ id?: string; url_imagem: string }];
+  @IsArray()
+  banners?: string[] | { id?: string; url_imagem: string }[] | string;
 
   @IsNotEmpty({ message: 'Estoque não pode estar vazio' })
   stock_id: string;

@@ -1,5 +1,5 @@
-export interface InitSessionResult {
-  status: 'connected' | 'error' | 'initialized' | 'pending' | 'loading';
+export interface InitSession {
+  status: 'initialized' | 'connected' | 'error';
   qr?: string;
   message?: string;
 }

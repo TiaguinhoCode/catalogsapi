@@ -1,3 +1,30 @@
-2025/10/24-00:24:53.219 15b0d Reusing MANIFEST /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Local Storage/leveldb/MANIFEST-000001
-2025/10/24-00:24:53.229 15b0d Recovering log #13
-2025/10/24-00:24:53.230 15b0d Reusing old log /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Local Storage/leveldb/000013.log 
+2025/11/16-11:08:49.530 25b2 Reusing MANIFEST /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Local Storage/leveldb/MANIFEST-000001
+2025/11/16-11:08:49.541 25b2 Recovering log #4
+2025/11/16-11:08:49.544 25b2 Reusing old log /home/tiago/Projetos/catalogsapi/tokens/default-session/Default/Local Storage/leveldb/000004.log 
+2025/11/16-11:10:50.525 25b4 Level-0 table #8: started
+2025/11/16-11:10:50.529 25b4 Level-0 table #8: 12786 bytes OK
+2025/11/16-11:10:50.532 25b4 Delete type=0 #4
+2025/11/16-12:41:50.525 25b4 Level-0 table #10: started
+2025/11/16-12:41:50.529 25b4 Level-0 table #10: 12218 bytes OK
+2025/11/16-12:41:50.533 25b4 Delete type=0 #7
+2025/11/16-14:10:50.525 25b4 Level-0 table #12: started
+2025/11/16-14:10:50.528 25b4 Level-0 table #12: 13387 bytes OK
+2025/11/16-14:10:50.531 25b4 Delete type=0 #9
+2025/11/16-15:29:50.526 25b4 Level-0 table #14: started
+2025/11/16-15:29:50.531 25b4 Level-0 table #14: 11768 bytes OK
+2025/11/16-15:29:50.536 25b4 Delete type=0 #11
+2025/11/16-17:02:50.526 25b4 Level-0 table #16: started
+2025/11/16-17:02:50.530 25b4 Level-0 table #16: 11448 bytes OK
+2025/11/16-17:02:50.533 25b4 Delete type=0 #13
+2025/11/16-17:02:50.533 25b4 Compacting 4@0 + 1@1 files
+2025/11/16-17:02:50.539 25b4 Generated table #17@0: 34 keys, 3485 bytes
+2025/11/16-17:02:50.539 25b4 Compacted 4@0 + 1@1 files => 3485 bytes
+2025/11/16-17:02:50.541 25b4 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/11/16-17:02:50.542 25b4 Delete type=2 #14
+2025/11/16-17:02:50.542 25b4 Delete type=2 #16
+2025/11/16-17:02:50.542 25b4 Delete type=2 #8
+2025/11/16-17:02:50.542 25b4 Delete type=2 #12
+2025/11/16-17:02:50.542 25b4 Delete type=2 #10
+2025/11/16-18:39:50.526 25b4 Level-0 table #19: started
+2025/11/16-18:39:50.530 25b4 Level-0 table #19: 12317 bytes OK
+2025/11/16-18:39:50.533 25b4 Delete type=0 #15
