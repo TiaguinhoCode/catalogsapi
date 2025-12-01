@@ -21,20 +21,18 @@ export class WppsController {
     @Param('sessionName') sessionName: string,
     @Body() data: { phone: string },
   ) {
-    return await this.wppsService.initSessionByPhone(sessionName, data.phone);
+    const resp = await this.wppsService.initSessionByPhone(data.phone, sessionName);
+
+    return {msg: 'ok', code: resp}
   }
 
-  @Post('session/:sessionName/chat')
-  async getChat(
-    @Param('sessionName') sessionName: string,
-    @Body()
-    data: {
-      count?: number;
-      onlyUsers?: boolean;
-      onlyGroups?: boolean;
-      onlyWithUnread?: boolean;
-    },
-  ) {
-    return await this.wppsService.listChats(sessionName, data);
+  @Get('session/:sessionName/qrcode')
+  async getAuthQrCode(@Param('sessionName') sessionName: string) {
+    return this.wppsService.initSessionForQr(sessionName)
+  }
+
+  @Get('session/:sessionName/chat')
+  async listCHat(@Param('sessionName') sessionName: string) {
+    return this.wppsService.listConversations(sessionName)
   }
 }

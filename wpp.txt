@@ -1,0 +1,38 @@
+// Nest
+import { Injectable } from '@nestjs/common';
+
+// Bibliotecas
+import{create, Whatsapp} from '@wppconnect-team/wppconnect';
+
+// wppconnect.defaultLogger.level = 'silly';
+// wppconnect.defaultLogger.transports.forEach((t) => (t.silent = true));
+
+@Injectable()
+export class WppsService {
+  private sessionCache = new Map<string, { code: string; created: number; client?: Whatsapp }>();
+
+  async initSessionByPhone(phone: string, sessionName: string): Promise<string> {
+    const existing = this.sessionCache.get(sessionName);
+    const now = Date.now();
+
+    if (existing && now - existing.created < 50000) {
+      return existing.code;
+    }
+
+    return new Promise((resolve, reject) => {
+      create({
+        session: sessionName,
+        phoneNumber: phone,
+        catchLinkCode: (code: string) => {
+          this.sessionCache.set(sessionName, { code, created: Date.now() });
+          resolve(code);
+        },
+      })
+      .then((client: Whatsapp) => {
+        const record = this.sessionCache.get(sessionName);
+        if (record) record.client = client;
+      })
+      .catch((err) => reject(err));
+    });
+  }
+}
