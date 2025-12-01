@@ -37,10 +37,13 @@ export class WppsService {
     return client;
   }
 
-  async initSessionByPhone(
-    sessionName: string,
-    phoneNumber: string,
-  ): Promise<SessionResult> {
+  async initSessionByPhone({
+    sessionName,
+    phoneNumber,
+  }: {
+    sessionName: string;
+    phoneNumber: string;
+  }): Promise<SessionResult> {
     return new Promise<SessionResult>((resolve, reject) => {
       wppconnect
         .create({

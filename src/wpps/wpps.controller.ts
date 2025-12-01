@@ -21,7 +21,10 @@ export class WppsController {
     @Param('sessionName') sessionName: string,
     @Body() data: { phone: string },
   ) {
-    return await this.wppsService.initSessionByPhone(sessionName, data.phone);
+    return await this.wppsService.initSessionByPhone({
+      sessionName,
+      phoneNumber: data.phone,
+    });
   }
 
   @Post('session/:sessionName/chat')
