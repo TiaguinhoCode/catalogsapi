@@ -1,88 +1,89 @@
 // Nest
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 // Bibliotecas
-import * as wppconnect from '@wppconnect-team/wppconnect';
-import { FileTokenStore } from '@wppconnect-team/wppconnect/dist/token-store';
-
-export interface SessionResult {
-  status: 'initialized' | 'connected' | 'error';
-  qr?: string;
-  message?: string;
-}
-
-interface ClientMap {
-  [sessionName: string]: wppconnect.Whatsapp;
-}
+import { create, Whatsapp } from '@wppconnect-team/wppconnect';
 
 // wppconnect.defaultLogger.level = 'silly';
 // wppconnect.defaultLogger.transports.forEach((t) => (t.silent = true));
 
 @Injectable()
 export class WppsService {
-  private clients: ClientMap = {};
-  private tokenStore = new FileTokenStore({ path: './tokens' });
+  private clients = new Map<string, Whatsapp>();
 
-  private async createClient(
+  async initSessionByPhone(
+    phone: string,
     sessionName: string,
-    options: Partial<wppconnect.CreateConfig> = {},
-  ) {
-    const client = await wppconnect.create({
-      session: sessionName,
-      tokenStore: this.tokenStore,
-      headless: true,
-      ...options,
+  ): Promise<string> {
+    return new Promise((resolve, reject) => {
+      create({
+        session: sessionName,
+        phoneNumber: phone,
+        catchLinkCode: (code: string) => {
+          resolve(code);
+        },
+      })
+        .then((client: Whatsapp) => {
+          this.clients.set(sessionName, client);
+        })
+        .catch((err) => reject(err));
     });
-    this.clients[sessionName] = client;
-    return client;
   }
 
-  async initSessionByPhone({
-    sessionName,
-    phoneNumber,
-  }: {
-    sessionName: string;
-    phoneNumber: string;
-  }): Promise<SessionResult> {
-    return new Promise<SessionResult>((resolve, reject) => {
-      wppconnect
-        .create({
-          session: sessionName,
-          phoneNumber: phoneNumber,
-          tokenStore: this.tokenStore,
-          headless: true,
-          catchLinkCode: (linkCode) => {
-            resolve({ status: 'initialized', message: linkCode });
-          },
-        })
+  async initSessionForQr(sessionName: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      create({
+        session: sessionName,
+        catchQR: (base64Qrimg, asciiQr) => {
+          resolve(asciiQr);
+        },
+      })
         .then((client) => {
-          this.clients[sessionName] = client;
+          this.clients.set(sessionName, client);
         })
-        .catch((err: any) => {
-          reject({ status: 'error', message: err.message });
-        });
+        .catch((err) => reject(err));
     });
   }
 
-  async listChats(
-    sessionName: string,
-    options?: {
-      count?: number;
-      onlyUsers?: boolean;
-      onlyGroups?: boolean;
-      onlyWithUnread?: boolean;
-    },
-  ) {
-    let client = this.clients[sessionName];
-    if (!client) {
-      client = await this.createClient(sessionName);
-    }
-    const chats = await client.listChats({
-      count: options?.count,
-      onlyUsers: options?.onlyUsers,
-      onlyGroups: options?.onlyGroups,
-      onlyWithUnreadMessage: options?.onlyWithUnread,
-    });
-    return chats;
+  async listConversations(sessionName: string) {
+    const client = this.clients.get(sessionName);
+
+    if (!client) throw new BadRequestException('Sessão não inicializada');
+
+    const chats = await client.listChats({ onlyUsers: true, count: 50 });
+
+    const result = await Promise.all(
+      chats.map(async (chat) => {
+        const chatId = chat.id._serialized;
+        let lastMessage: {
+          body?: string;
+          fromMe: boolean;
+          timestamp: number;
+        } | null = null;
+
+        try {
+          const messages = await client.getMessages(chatId, { count: 1 });
+          console.log('Msg: ', messages);
+          if (messages.length > 0) {
+            const msg = messages[0];
+            lastMessage = {
+              body: msg.body,
+              fromMe: msg.fromMe,
+              timestamp: msg.t,
+            };
+          }
+        } catch (e) {}
+
+        return {
+          id: chatId,
+          phone: chat.id.user,
+          name: chat.name ?? chat.contact.pushname,
+          photo: chat.contact.profilePicThumbObj?.eurl,
+          lastMessage,
+        };
+      }),
+    );
+
+    return result;
   }
 }

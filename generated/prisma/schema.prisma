@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id            String     @id @default(uuid())
+  name          String
+  surname       String
+  phone         String
+  cep           String?
+  photo         String?
+  is_active     Boolean    @default(true)
+  checked       Boolean    @default(false)
+  rule_id       String
+  validation_id String?    @unique @default(uuid())
+  created_at    DateTime?  @default(now())
+  updated_at    DateTime?  @updatedAt
+  email         String?
+  enterprise_id String?
+  passoword     String?
+  enterprise    Companies? @relation(fields: [enterprise_id], references: [id])
+  rule          Rules      @relation(fields: [rule_id], references: [id])
+
+  @@map("users")
+}
+
+model Rules {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  Users      Users[]
+
+  @@map("rules")
+}
+
+model Companies {
+  id              String      @id @default(uuid())
+  company_fantasy String
+  company_reason  String
+  company_acronym String
+  logo_company    String?
+  cnpj            String
+  cep_address     String
+  phone           String?
+  is_active       Boolean     @default(true)
+  warehouse_id    String?     @unique
+  opening_hours   DateTime    @db.Time(6)
+  close_hours     DateTime    @db.Time(6)
+  created_at      DateTime?   @default(now())
+  updated_at      DateTime?   @updatedAt
+  company_number  Int
+  warehouse       Warehouses? @relation(fields: [warehouse_id], references: [id])
+  Users           Users[]
+
+  @@map("companies")
+}
+
+model Warehouses {
+  id         String     @id @default(uuid())
+  name       String     @unique
+  is_active  Boolean    @default(true)
+  created_at DateTime?  @default(now())
+  updated_at DateTime?  @updatedAt
+  Companies  Companies?
+  Stocks     Stocks[]
+
+  @@map("warehouses")
+}
+
+model Stocks {
+  id                  String    @id @default(uuid())
+  warehouse_id        String
+  current_quantity    Int
+  minimium_quantity   Int
+  maximum_quantity    Int
+  price               Float
+  purchase_price      Float
+  cost_price          Float
+  has_discount        Boolean   @default(false)
+  discount_percentage Float?
+  created_at          DateTime? @default(now())
+  updated_at          DateTime? @updatedAt
+
+  Products  Products[]
+  warehouse Warehouses @relation(fields: [warehouse_id], references: [id])
+
+  @@map("stocks")
+}
+
+model Products {
+  id                   String    @id @default(uuid())
+  name                 String
+  stock_id             String
+  category_id          String
+  brand_id             String
+  product_code         String    @unique
+  description          String?
+  sales_unit           String
+  is_active            Boolean   @default(true)
+  date_of_inactivation DateTime?
+  created_at           DateTime? @default(now())
+  updated_at           DateTime? @updatedAt
+
+  items    Orders_Itens?
+  brand    Brands        @relation(fields: [brand_id], references: [id])
+  stock    Stocks        @relation(fields: [stock_id], references: [id], onDelete: Cascade)
+  category Categories    @relation(fields: [category_id], references: [id])
+  banners  Banners[]
+  supliers Suppliers[]   @relation("ProductsToSuppliers")
+
+  @@map("products")
+}
+
+model Brands {
+  id         String     @id @default(uuid())
+  name       String
+  created_at DateTime?  @default(now())
+  updated_at DateTime?  @updatedAt
+  Products   Products[]
+
+  @@map("brands")
+}
+
+model Banners {
+  id            String    @id @default(uuid())
+  url_imagem    String
+  display_order Int?      @unique
+  product_id    String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime? @updatedAt
+
+  products Products? @relation(fields: [product_id], references: [id])
+
+  @@map("banners")
+}
+
+model Categories {
+  id         String     @id @default(uuid())
+  name       String
+  created_at DateTime?  @default(now())
+  updated_at DateTime?  @updatedAt
+  Products   Products[]
+
+  @@map("categories")
+}
+
+model Suppliers {
+  id              String     @id @default(uuid())
+  company_fantasy String
+  company_reason  String
+  company_acronym String
+  cnpj            String
+  email           String
+  phone           String
+  is_active       Boolean    @default(true)
+  created_at      DateTime?  @default(now())
+  updated_at      DateTime?  @updatedAt
+  products        Products[] @relation("ProductsToSuppliers")
+
+  @@map("suppliers")
+}
+
+model Orders {
+  id                String            @id @default(uuid())
+  release_date      DateTime
+  completion_date   DateTime
+  status_id         String
+  cancellation_date DateTime?
+  delivery_date     DateTime?
+  gross_value       Float
+  net_value         Float
+  shipping_price    Float
+  type_sale         String
+  cep_addres        String?
+  addres_number     String?
+  delivery_code     String?
+  created_at        DateTime?         @default(now())
+  updated_at        DateTime?         @updatedAt
+  status            Status            @relation(fields: [status_id], references: [id])
+  items             Orders_Itens?
+  method_payments   Method_Payments[] @relation("Method_PaymentsToOrders")
+
+  @@map("orders")
+}
+
+model Status {
+  id         String    @id @default(uuid())
+  name       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  Orders     Orders[]
+
+  @@map("status")
+}
+
+model Method_Payments {
+  id         String    @id @default(uuid())
+  name       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  orders     Orders[]  @relation("Method_PaymentsToOrders")
+
+  @@map("method_payments")
+}
+
+model Orders_Itens {
+  orders_id   String   @unique
+  products_id String   @unique
+  Orders      Orders   @relation(fields: [orders_id], references: [id])
+  Products    Products @relation(fields: [products_id], references: [id])
+
+  @@map("orders_itens")
+}
