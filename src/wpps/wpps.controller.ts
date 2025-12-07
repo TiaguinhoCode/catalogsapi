@@ -21,25 +21,43 @@ export class WppsController {
     @Param('sessionName') sessionName: string,
     @Body() data: { phone: string },
   ) {
-<<<<<<< HEAD
-    return await this.wppsService.initSessionByPhone({
-      sessionName,
-      phoneNumber: data.phone,
-    });
-=======
-    const resp = await this.wppsService.initSessionByPhone(data.phone, sessionName);
-
-    return {msg: 'ok', code: resp}
->>>>>>> 45ae3b1cf6dc48bca5c9c11eca96e26ca877ebf2
+    return {
+      msg: 'ok',
+      code: await this.wppsService.initSessionByPhone(data.phone, sessionName),
+    };
   }
 
   @Get('session/:sessionName/qrcode')
   async getAuthQrCode(@Param('sessionName') sessionName: string) {
-    return this.wppsService.initSessionForQr(sessionName)
+    const createSession = await this.wppsService.initSessionForQr(sessionName);
+
+    if (createSession === "Sessão '11342' já está em execução.")
+      return { status: createSession };
+
+    return createSession;
+  }
+
+  @Get('session/:sessionName/status')
+  async getStatusSession(@Param('sessionName') sessionName: string) {
+    return this.wppsService.getStatusSession(sessionName);
   }
 
   @Get('session/:sessionName/chat')
-  async listCHat(@Param('sessionName') sessionName: string) {
-    return this.wppsService.listConversations(sessionName)
+  async listChat(@Param('sessionName') sessionName: string) {
+    return {
+      msg: 'ok',
+      chats: await this.wppsService.listChatsOverview(sessionName),
+    };
+  }
+
+  @Get('session/:sessionName/chat/:chatId')
+  async listChatMessages(
+    @Param('sessionName') sessionName: string,
+    @Param('chatId') chatId: string,
+  ) {
+    return {
+      msg: 'filter applied',
+      chats: await this.wppsService.listChatsPeerId(sessionName, chatId),
+    };
   }
 }
