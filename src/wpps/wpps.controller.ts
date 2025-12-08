@@ -7,10 +7,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 
 // Service
 import { WppsService } from './wpps.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('wpps')
 export class WppsController {
@@ -58,6 +61,39 @@ export class WppsController {
     return {
       msg: 'filter applied',
       chats: await this.wppsService.listChatsPeerId(sessionName, chatId),
+    };
+  }
+
+  @Post('session/:sessionName/chat/sendmsg/:phone')
+  async sendMsg(
+    @Param('sessionName') sessionName: string,
+    @Param('phone') phone: string,
+    @Body() data: { msg: string },
+  ) {
+    return {
+      msg: 'Message sent successfully',
+      chat: await this.wppsService.sendMsg({
+        sessionName,
+        to: phone,
+        msg: data.msg,
+      }),
+    };
+  }
+
+  @Post('session/:sessionName/chat/file/:phone')
+  async sendMsgWithImg(
+    @Param('sessionName') sessionName: string,
+    @Param('phone') phone: string,
+    @Body() data: { msg: string; imgUrl: string },
+  ) {
+    return {
+      msg: 'Message sent successfully',
+      chat: await this.wppsService.sendMsgWithImg({
+        sessionName,
+        to: phone,
+        imgUri: data.imgUrl,
+        msg: data.msg,
+      }),
     };
   }
 }

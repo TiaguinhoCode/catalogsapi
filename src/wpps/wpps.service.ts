@@ -7,6 +7,8 @@ import {
 
 // Bibliotecas
 import { create, StatusFind, Whatsapp } from '@wppconnect-team/wppconnect';
+import sharp from 'sharp';
+import { WppsGateway } from './gateway/wpps.gateway';
 
 // wppconnect.defaultLogger.level = 'silly';
 // wppconnect.defaultLogger.transports.forEach((t) => (t.silent = true));
@@ -15,6 +17,20 @@ import { create, StatusFind, Whatsapp } from '@wppconnect-team/wppconnect';
 export class WppsService {
   private clients = new Map<string, Whatsapp>();
   private status = new Map<string, StatusFind>();
+
+  constructor(private wppsGateway: WppsGateway) {}
+
+  private setupRealtimeTime(client: Whatsapp, sessionName: string) {
+    client.onMessage(async (msg) => {
+      this.wppsGateway.emitNewMessage(sessionName, {
+        from: msg.from,
+        body: msg.body,
+        type: msg.type,
+        timestamp: msg.timestamp,
+        fromMe: msg.fromMe,
+      });
+    });
+  }
 
   async initSessionByPhone(
     phone: string,
@@ -61,7 +77,7 @@ export class WppsService {
           }
         },
         statusFind: (statusSession: StatusFind, session: string) => {
-          console.log('WPP statusFind:', statusSession, 'session:', session);
+          // console.log('WPP statusFind:', statusSession, 'session:', session);
           // Se quiser, também pode resolver por um status que indique QR pronto
           if (!resolved) {
             if (statusSession === 'inChat') {
@@ -73,6 +89,7 @@ export class WppsService {
       })
         .then((client: Whatsapp) => {
           this.clients.set(sessionName, client);
+          this.setupRealtimeTime(client, sessionName);
         })
         .catch((err) => {
           clearTimeout(timer);
@@ -144,41 +161,35 @@ export class WppsService {
 
     try {
       const msgs = await client.getMessages(chatId, { count: 100 });
-
+      // console.log('msg: ', msgs);
       const results = await Promise.all(
         msgs
           .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
           .map(async (m) => {
             const quoted = m.quotedMsgObj;
-            let mediaUrl: string | null = null;
+            let mediaBase64: string | null = null;
 
-            // Verifica se a mensagem possui mídia e retorna a URL diretamente
-            if (
-              m.type === 'image' ||
-              m.type === 'video' ||
-              m.type === 'audio' ||
-              m.type === 'ptt' ||
-              m.type === 'document' ||
-              m.type === 'sticker'
-            ) {
-              // Tenta pegar a URL da mídia diretamente
-              mediaUrl = m.deprecatedMms3Url || m.clientUrl || null;
+            if (m.type === 'sticker') {
+              const buffer = await client.decryptFile(m);
+              const compressedBuffer = await sharp(buffer)
+                .resize(64, 64, { fit: 'inside' })
+                .webp({ quality: 50 })
+                .toBuffer();
+              mediaBase64 = compressedBuffer.toString('base64');
             }
 
             return {
               from: m.from,
               to: m.to,
               type: m.type,
-              body: m.body ?? null,
+              msg: m.body ?? null,
               isNewMsg: m.recvFresh,
               from_msg: quoted ? { body: (quoted as any).body ?? null } : null,
-              formattedNumber_to: m.to,
               fromMe: m.fromMe,
               timestamp: m.t || m.timestamp,
-              content: m.body ?? null,
               profilePicThumbUrl: m.sender?.profilePicThumbObj?.eurl ?? null,
               mimetype: m.mimetype ?? null,
-              mediaUrl, // URL da mídia ao invés de base64
+              mediaBase64,
             };
           }),
       );
@@ -191,5 +202,52 @@ export class WppsService {
           "O campo 'chatId' é obrigatório e não pode estar vazio.",
         );
     }
+  }
+
+  async sendMsg({
+    sessionName,
+    to,
+    msg,
+  }: {
+    sessionName: string;
+    to: string;
+    msg: string;
+  }) {
+    const client = this.clients.get(sessionName);
+
+    if (!client) throw new BadRequestException('Sessão não inicializada');
+
+    // if (!msg) adicionar DTO
+    //   throw new BadRequestException('Campo messagem é um campo obrigatório');
+    // if (!to)
+    //   throw new BadRequestException('Campo telefone é um campo obrigatório');
+
+    const chatId = to.includes('@c.us') ? to : `${to}@c.us`;
+    await client.sendText(chatId, msg);
+
+    return { to: chatId, msg };
+  }
+
+  async sendMsgWithImg({
+    sessionName,
+    to,
+    imgUri,
+    msg,
+  }: {
+    sessionName: string;
+    to: string;
+    imgUri: string;
+    msg: string;
+  }) {
+    const client = this.clients.get(sessionName);
+
+    // console.log('Url: ', imgUri);
+    if (!client) throw new BadRequestException('Sessão não inicializada');
+
+    const chatId = to.includes('@c.us') ? to : `${to}@c.us`;
+
+    await client.sendFile(chatId, imgUri, { caption: msg });
+
+    return { to: chatId, msg };
   }
 }
