@@ -1,24 +1,20 @@
 // Nest
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseInterceptors,
-  UploadedFile,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 
 // Service
 import { WppsService } from './wpps.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+
+// Guards
+import { AuthGuard } from 'src/guard/auth/auth.guard';
+import { RulesGuard } from 'src/guard/rules/rules.guard';
+import { Roles } from 'src/guard/rules/roles.decorator';
 
 @Controller('wpps')
 export class WppsController {
   constructor(private readonly wppsService: WppsService) {}
 
+  @UseGuards(AuthGuard /*RulesGuard*/)
+  // @Roles('Support')
   @Post('session/:sessionName/phone')
   async startByPhone(
     @Param('sessionName') sessionName: string,
@@ -30,6 +26,8 @@ export class WppsController {
     };
   }
 
+  @UseGuards(AuthGuard /*RulesGuard*/)
+  // @Roles('Support')
   @Get('session/:sessionName/qrcode')
   async getAuthQrCode(@Param('sessionName') sessionName: string) {
     const createSession = await this.wppsService.initSessionForQr(sessionName);
@@ -40,11 +38,15 @@ export class WppsController {
     return createSession;
   }
 
+  @UseGuards(AuthGuard /*RulesGuard*/)
+  // @Roles('Support')
   @Get('session/:sessionName/status')
   async getStatusSession(@Param('sessionName') sessionName: string) {
     return this.wppsService.getStatusSession(sessionName);
   }
 
+  @UseGuards(AuthGuard /*RulesGuard*/)
+  // @Roles('Support')
   @Get('session/:sessionName/chat')
   async listChat(@Param('sessionName') sessionName: string) {
     return {
@@ -53,6 +55,8 @@ export class WppsController {
     };
   }
 
+  @UseGuards(AuthGuard /*RulesGuard*/)
+  // @Roles('Support')
   @Get('session/:sessionName/chat/:chatId')
   async listChatMessages(
     @Param('sessionName') sessionName: string,
@@ -64,6 +68,8 @@ export class WppsController {
     };
   }
 
+  @UseGuards(AuthGuard /*RulesGuard*/)
+  // @Roles('Support')
   @Post('session/:sessionName/chat/sendmsg/:phone')
   async sendMsg(
     @Param('sessionName') sessionName: string,
@@ -80,6 +86,8 @@ export class WppsController {
     };
   }
 
+  @UseGuards(AuthGuard /*RulesGuard*/)
+  // @Roles('Support')
   @Post('session/:sessionName/chat/file/:phone')
   async sendMsgWithImg(
     @Param('sessionName') sessionName: string,

@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Companies {
+  id              String    @id @default(uuid())
+  company_fantasy String
+  company_reason  String
+  company_acronym String
+  logo_company    String?
+  cnpj            String
+  cep_address     String
+  phone           String?
+  is_active       Boolean   @default(true)
+  opening_hours   DateTime  @db.Time(6)
+  close_hours     DateTime  @db.Time(6)
+  session_id      String    @unique
+  created_at      DateTime? @default(now())
+  updated_at      DateTime? @updatedAt
+  company_number  Int
+
+  users Users[] @relation("EnterpriseUsers")
+
+  @@map("companies")
+}
+
+model Users {
+  id            String    @id @default(uuid())
+  name          String
+  surname       String
+  phone         String
+  cep           String?
+  photo_url     String?
+  is_active     Boolean   @default(true)
+  email         String?
+  passoword     String?
+  enterprise_id String?
+  rules         String
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @updatedAt
+
+  enterprise Companies? @relation("EnterpriseUsers", fields: [enterprise_id], references: [id])
+
+  @@map("users")
+}
