@@ -9,6 +9,7 @@ import {
 import { create, StatusFind, Whatsapp } from '@wppconnect-team/wppconnect';
 import sharp from 'sharp';
 import { WppsGateway } from './gateway/wpps.gateway';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 // wppconnect.defaultLogger.level = 'silly';
 // wppconnect.defaultLogger.transports.forEach((t) => (t.silent = true));
@@ -18,17 +19,24 @@ export class WppsService {
   private clients = new Map<string, Whatsapp>();
   private status = new Map<string, StatusFind>();
 
-  constructor(private wppsGateway: WppsGateway) {}
+  constructor(
+    private wppsGateway: WppsGateway,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   private setupRealtimeTime(client: Whatsapp, sessionName: string) {
     client.onMessage(async (msg) => {
-      this.wppsGateway.emitNewMessage(sessionName, {
+      const messageData = {
+        sessionName,
         from: msg.from,
         body: msg.body,
         type: msg.type,
         timestamp: msg.timestamp,
         fromMe: msg.fromMe,
-      });
+      };
+
+      this.wppsGateway.emitNewMessage(sessionName, messageData);
+      this.eventEmitter.emit('wpp.message', messageData);
     });
   }
 

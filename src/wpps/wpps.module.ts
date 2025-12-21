@@ -10,7 +10,11 @@ import { WppsController } from './wpps.controller';
 // Gateway
 import { WppsGateway } from './gateway/wpps.gateway';
 
+// Bibliotecas
+import { HttpModule } from '@nestjs/axios';
+
 @Module({
+  imports: [HttpModule],
   controllers: [WppsController],
   providers: [WppsService, WppsGateway],
 })

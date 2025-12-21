@@ -16,9 +16,11 @@ import { AuthModule } from './auth/auth.module';
 
 // Guards
 import { RulesGuard } from './guard/rules/rules.guard';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     WppsModule,
     PrismaModule,
     CompaniesModule,
