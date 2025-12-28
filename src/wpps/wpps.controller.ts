@@ -29,8 +29,16 @@ export class WppsController {
   @UseGuards(AuthGuard /*RulesGuard*/)
   // @Roles('Support')
   @Get('session/:sessionName/qrcode')
-  async getAuthQrCode(@Param('sessionName') sessionName: string) {
-    const createSession = await this.wppsService.initSessionForQr(sessionName);
+  async getAuthQrCode(
+    @Param('sessionName') sessionName: string,
+    @Param('isImg') isImg?: string,
+  ) {
+    let isImgBolean = isImg === 'true' ? true : false;
+
+    const createSession = await this.wppsService.initSessionForQr(
+      sessionName,
+      isImgBolean,
+    );
 
     if (createSession === "Sessão '11342' já está em execução.")
       return { status: createSession };
@@ -102,6 +110,18 @@ export class WppsController {
         imgUri: data.imgUrl,
         msg: data.msg,
       }),
+    };
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('session/:sessionName/contact/:contactId')
+  async getContact(
+    @Param('sessionName') sessionName: string,
+    @Param('contactId') contactId: string,
+  ) {
+    return {
+      msg: 'filter applied',
+      contact: await this.wppsService.getContactById(sessionName, contactId),
     };
   }
 }
