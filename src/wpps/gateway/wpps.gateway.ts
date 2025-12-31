@@ -12,6 +12,7 @@ import { Injectable } from '@nestjs/common';
 
 // Bibliotecas
 import { Server, Socket } from 'socket.io';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 @WebSocketGateway({
@@ -26,11 +27,11 @@ export class WppsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly httpService: HttpService) {}
 
   handleConnection(client: Socket) {
-    console.log(`Cliente conectado: ${client.id}`);
+    // console.log(`Cliente conectado: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Cliente desconectado: ${client.id}`);
+    // console.log(`Cliente desconectado: ${client.id}`);
   }
 
   emitNewMessage(sessionName: string, data: any) {
@@ -43,19 +44,40 @@ export class WppsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.join(sessionName);
   }
 
-  // @OnEvent('wpp.message')
-  // async handleWhatsappMessage(payload: any) {
-  //   // console.log('Payload: ', payload);
-  //   this.server.emit('newMessage', payload);
-  //   const webhookUrl =
-  //     'https://economicaautocenter.autotasker.com.br/webhook-test/whatsapp';
-  //   // 'https://economicaautocenter.autotasker.com.br/webhook/whatsapp';
-  //   try {
-  //     const response = await firstValueFrom(
-  //       this.httpService.post(webhookUrl, payload),
-  //     );
-  //   } catch (error) {
-  //     // console.error('Erro ao enviar webhook pro n8n:', error);
-  //   }
-  // }
+  @OnEvent('wpp.message')
+  async handleWhatsappMessage(payload: any) {
+    // console.log('📨 Mensagem recebida:', payload);
+
+    // ✅ ADICIONE: Filtrar apenas mensagens recebidas (não suas)
+    if (payload.fromMe) {
+      console.log('⏭️ Ignorando mensagem enviada por mim');
+      return;
+    }
+
+    this.server.emit('newMessage', payload);
+
+    const webhookUrl =
+      'https://logichub.vps-kinghost.net/webhook-test/3af945f9-d454-44ba-97bd-5a844530ab3a';
+
+    try {
+      // console.log('🔄 Enviando webhook para n8n...');
+
+      const response = await firstValueFrom(
+        this.httpService.post(webhookUrl, payload, {
+          timeout: 10000, // ✅ ADICIONE: timeout de 10s
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+      );
+
+      // console.log('✅ Webhook enviado com sucesso:', response.status);
+      // console.log('📦 Resposta do n8n:', response.data);
+    } catch (error) {
+      console.error('❌ Erro ao enviar webhook pro n8n:');
+      console.error('Status:', error.response?.status);
+      console.error('Mensagem:', error.message);
+      console.error('Dados:', error.response?.data);
+    }
+  }
 }

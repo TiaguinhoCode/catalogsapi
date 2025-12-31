@@ -34,7 +34,7 @@ export class WppsService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    console.log('🔄 Iniciando restauração de sessões...');
+    // console.log('🔄 Iniciando restauração de sessões...');
     this.restoreAllSessions().catch((err) => {
       console.error('❌ Erro ao restaurar sessões:', err.message);
     });
@@ -43,7 +43,7 @@ export class WppsService implements OnModuleInit {
   private async restoreAllSessions() {
     try {
       if (!fs.existsSync(this.tokensPath)) {
-        console.log('📁 Nenhuma sessão anterior encontrada.');
+        // console.log('📁 Nenhuma sessão anterior encontrada.');
         return;
       }
 
@@ -53,18 +53,18 @@ export class WppsService implements OnModuleInit {
         .map((dirent) => dirent.name);
 
       if (sessionFolders.length === 0) {
-        console.log('📁 Nenhuma sessão anterior encontrada.');
+        // console.log('📁 Nenhuma sessão anterior encontrada.');
         return;
       }
 
-      console.log(
-        `📱 Encontradas ${sessionFolders.length} sessão(ões) para restaurar`,
-      );
+      // console.log(
+      //   `📱 Encontradas ${sessionFolders.length} sessão(ões) para restaurar`,
+      // );
 
       const restorePromises = sessionFolders.map((sessionName) =>
         this.restoreSession(sessionName)
           .then(() => {
-            console.log(`✅ Sessão '${sessionName}' restaurada com sucesso`);
+            // console.log(`✅ Sessão '${sessionName}' restaurada com sucesso`);
           })
           .catch((error) => {
             console.error(
@@ -76,7 +76,7 @@ export class WppsService implements OnModuleInit {
       );
 
       await Promise.allSettled(restorePromises);
-      console.log('✅ Processo de restauração concluído');
+      // console.log('✅ Processo de restauração concluído');
     } catch (error) {
       console.error('❌ Erro ao restaurar sessões:', error);
     }
@@ -85,7 +85,7 @@ export class WppsService implements OnModuleInit {
   private async restoreSession(sessionName: string): Promise<string | void> {
     // ✅ Verifica se já está inicializando
     if (this.isInitializing.get(sessionName)) {
-      console.log(`⏳ Sessão '${sessionName}' já está sendo inicializada`);
+      // console.log(`⏳ Sessão '${sessionName}' já está sendo inicializada`);
       return this.initializationPromises.get(sessionName);
     }
 
@@ -93,7 +93,7 @@ export class WppsService implements OnModuleInit {
     if (this.clients.has(sessionName)) {
       const status = this.status.get(sessionName);
       if (status === 'inChat') {
-        console.log(`✅ Sessão '${sessionName}' já está conectada`);
+        // console.log(`✅ Sessão '${sessionName}' já está conectada`);
         return Promise.resolve();
       }
     }
@@ -170,9 +170,9 @@ export class WppsService implements OnModuleInit {
     const attempts = this.reconnectionAttempts.get(sessionName) || 0;
 
     if (attempts >= this.MAX_RECONNECT_ATTEMPTS) {
-      console.log(
-        `⚠️ Sessão '${sessionName}' atingiu o máximo de tentativas de reconexão`,
-      );
+      // console.log(
+      //   `⚠️ Sessão '${sessionName}' atingiu o máximo de tentativas de reconexão`,
+      // );
       this.status.set(sessionName, 'disconnectedMobile');
       return;
     }
@@ -180,16 +180,16 @@ export class WppsService implements OnModuleInit {
     this.isReconnecting.set(sessionName, true);
     this.reconnectionAttempts.set(sessionName, attempts + 1);
 
-    console.log(
-      `🔄 Agendando reconexão para '${sessionName}' (tentativa ${attempts + 1}/${this.MAX_RECONNECT_ATTEMPTS})`,
-    );
+    // console.log(
+    //   `🔄 Agendando reconexão para '${sessionName}' (tentativa ${attempts + 1}/${this.MAX_RECONNECT_ATTEMPTS})`,
+    // );
 
     const delay = Math.min(5000 * Math.pow(2, attempts), 30000);
 
     setTimeout(async () => {
       try {
         await this.restoreSession(sessionName);
-        console.log(`✅ Sessão '${sessionName}' reconectada com sucesso`);
+        // console.log(`✅ Sessão '${sessionName}' reconectada com sucesso`);
         this.isReconnecting.set(sessionName, false);
       } catch (error) {
         console.error(
@@ -217,7 +217,7 @@ export class WppsService implements OnModuleInit {
     const timer = setTimeout(() => {
       this.qrCodes.delete(sessionName);
       this.qrTimers.delete(sessionName);
-      console.log(`QR Code da sessão '${sessionName}' removido da memória`);
+      // console.log(`QR Code da sessão '${sessionName}' removido da memória`);
     }, 50000);
 
     this.qrTimers.set(sessionName, timer);
@@ -241,28 +241,180 @@ export class WppsService implements OnModuleInit {
 
   private setupRealtimeTime(client: Whatsapp, sessionName: string) {
     client.onStateChange((state) => {
-      console.log(`📱 Estado mudou para '${sessionName}':`, state);
       this.status.set(sessionName, state);
 
       if (state === 'CONFLICT' || state === 'UNPAIRED') {
-        console.log(`⚠️ Sessão '${sessionName}' desconectada`);
+        // console.log(`⚠️ Sessão '${sessionName}' desconectada`);
         this.clients.delete(sessionName);
         this.scheduleReconnection(sessionName);
       }
     });
 
     client.onMessage(async (msg) => {
-      const messageData = {
-        sessionName,
-        from: msg.from,
-        body: msg.body,
-        type: msg.type,
-        timestamp: msg.timestamp,
-        fromMe: msg.fromMe,
-      };
+      try {
+        // Busca informações do contato
+        let contactName = 'Desconhecido';
+        let photo: string | undefined;
 
-      this.wppsGateway.emitNewMessage(sessionName, messageData);
-      this.eventEmitter.emit('wpp.message', messageData);
+        try {
+          const contact = await client.getContact(msg.from);
+          contactName =
+            contact.name || contact.pushname || msg.from.split('@')[0];
+        } catch (e) {
+          console.log('⚠️ Erro ao buscar contato:', e.message);
+        }
+
+        // Busca foto do perfil
+        try {
+          const profilePic = await client.getProfilePicFromServer(msg.from);
+          photo = profilePic?.eurl;
+        } catch (e) {
+          console.log('⚠️ Erro ao buscar foto:', e.message);
+        }
+
+        // ✅ Verifica se é uma resposta (quoted message)
+        const quoted = (msg as any).quotedMsg;
+        let quotedMediaBase64: string | null = null;
+
+        // ✅ Processa mídia da mensagem respondida (se houver)
+        if (quoted && ['sticker', 'image'].includes(quoted.type)) {
+          try {
+            const quotedBuffer = await client.decryptFile(quoted);
+
+            if (quoted.type === 'sticker') {
+              const compressedBuffer = await sharp(quotedBuffer)
+                .resize(64, 64, { fit: 'inside' })
+                .webp({ quality: 40 })
+                .toBuffer();
+              quotedMediaBase64 = compressedBuffer.toString('base64');
+            } else if (quoted.type === 'image') {
+              const thumbnail = await sharp(quotedBuffer)
+                .resize(500, 500, { fit: 'inside' })
+                .jpeg({
+                  quality: 80,
+                  chromaSubsampling: '4:4:4',
+                  mozjpeg: true,
+                })
+                .toBuffer();
+              quotedMediaBase64 = thumbnail.toString('base64');
+            }
+            // console.log('✅ Mídia da mensagem respondida processada');
+          } catch (e) {
+            console.error(
+              '❌ Erro ao processar mídia da mensagem respondida:',
+              e.message,
+            );
+          }
+        }
+
+        // ✅ Processa mídia da mensagem atual
+        let mediaBase64: string | null = null;
+        let mimetype: string | undefined;
+
+        if (['sticker', 'image'].includes(msg.type)) {
+          try {
+            mimetype = msg.mimetype;
+            const buffer = await client.decryptFile(msg);
+
+            if (msg.type === 'sticker') {
+              const compressedBuffer = await sharp(buffer)
+                .resize(64, 64, { fit: 'inside' })
+                .webp({ quality: 40 })
+                .toBuffer();
+              mediaBase64 = compressedBuffer.toString('base64');
+              mimetype = 'image/webp';
+              // console.log('✅ Sticker processado');
+            } else if (msg.type === 'image') {
+              const thumbnail = await sharp(buffer)
+                .resize(500, 500, { fit: 'inside' })
+                .jpeg({
+                  quality: 80,
+                  chromaSubsampling: '4:4:4',
+                  mozjpeg: true,
+                })
+                .toBuffer();
+              mediaBase64 = thumbnail.toString('base64');
+              mimetype = 'image/jpeg';
+              // console.log('✅ Imagem processada');
+            }
+          } catch (e) {
+            console.error(
+              `❌ Erro ao processar mídia do tipo ${msg.type}:`,
+              e.message,
+            );
+            mediaBase64 = null;
+          }
+        }
+
+        // ✅ Monta o payload enriquecido
+        const messageData = {
+          sessionName,
+          id: msg.from,
+          phone: msg.from.split('@')[0],
+          name: contactName,
+          photo,
+          lastMessage: {
+            type: msg.type,
+            msg: msg.body,
+            mediaBase64,
+            mimetype,
+            fromMe: msg.fromMe,
+            timestamp: msg.timestamp,
+            isReply: quoted ? true : false,
+            from_msg: quoted
+              ? {
+                  body: quoted.body ?? null,
+                  type: quoted.type ?? null,
+                  mimetype: quoted.mimetype ?? null,
+                  mediaBase64: quotedMediaBase64,
+                }
+              : null,
+          },
+        };
+
+        // console.log('📦 Payload enriquecido:', {
+        //   ...messageData,
+        //   lastMessage: {
+        //     ...messageData.lastMessage,
+        //     mediaBase64: mediaBase64
+        //       ? `${mediaBase64.substring(0, 50)}...`
+        //       : null,
+        //     from_msg: messageData.lastMessage.from_msg
+        //       ? {
+        //           ...messageData.lastMessage.from_msg,
+        //           mediaBase64: quotedMediaBase64
+        //             ? `${quotedMediaBase64.substring(0, 50)}...`
+        //             : null,
+        //         }
+        //       : null,
+        //   },
+        // });
+
+        this.wppsGateway.emitNewMessage(sessionName, messageData);
+        this.eventEmitter.emit('wpp.message', messageData);
+      } catch (error) {
+        console.error('❌ Erro ao processar mensagem:', error.message);
+
+        // ✅ Fallback: envia payload básico se der erro
+        const basicMessageData = {
+          id: msg.from,
+          sessionName,
+          phone: msg.from.split('@')[0],
+          name: 'Desconhecido',
+          unreadCount: 0,
+          lastMessage: {
+            type: msg.type,
+            body: msg.body,
+            fromMe: msg.fromMe,
+            timestamp: msg.timestamp,
+            isReply: false,
+            from_msg: null,
+          },
+        };
+
+        this.wppsGateway.emitNewMessage(sessionName, basicMessageData);
+        this.eventEmitter.emit('wpp.message', basicMessageData);
+      }
     });
   }
 
@@ -323,7 +475,7 @@ export class WppsService implements OnModuleInit {
     // ✅ Verifica se já tem QR Code válido
     const existingQr = this.getQrCodeFromMemory(sessionName);
     if (existingQr) {
-      console.log(`✅ QR Code existente retornado para '${sessionName}'`);
+      // console.log(`✅ QR Code existente retornado para '${sessionName}'`);
       return Promise.resolve(existingQr);
     }
 
@@ -344,7 +496,7 @@ export class WppsService implements OnModuleInit {
 
     // ✅ Se tem promise em andamento, aguarda ela
     if (this.initializationPromises.has(sessionName)) {
-      console.log(`⏳ Aguardando inicialização existente de '${sessionName}'`);
+      // console.log(`⏳ Aguardando inicialização existente de '${sessionName}'`);
       try {
         await this.initializationPromises.get(sessionName);
         // Após aguardar, tenta novamente
@@ -444,7 +596,7 @@ export class WppsService implements OnModuleInit {
       id: phone,
       sessionName,
       status: this.getStatusDescription(status),
-      isConnected: hasClient && status === 'inChat',
+      isConnected: (hasClient && status === 'inChat') || status === 'CONNECTED',
       isReconnecting: this.isReconnecting.get(sessionName) || false,
       isInitializing: this.isInitializing.get(sessionName) || false, // ✅ NOVO
       reconnectAttempts: this.reconnectionAttempts.get(sessionName) || 0,
@@ -452,7 +604,7 @@ export class WppsService implements OnModuleInit {
   }
 
   async forceReconnect(sessionName: string): Promise<void> {
-    console.log(`🔄 Forçando reconexão de '${sessionName}'`);
+    // console.log(`🔄 Forçando reconexão de '${sessionName}'`);
 
     // ✅ Verifica se já está inicializando
     if (this.isInitializing.get(sessionName)) {
@@ -491,7 +643,7 @@ export class WppsService implements OnModuleInit {
         await client.close();
         this.clients.delete(sessionName);
         this.status.set(sessionName, 'disconnectedMobile');
-        console.log(`✅ Sessão '${sessionName}' desconectada`);
+        // console.log(`✅ Sessão '${sessionName}' desconectada`);
       } catch (err) {
         throw new BadRequestException(
           `Erro ao desconectar sessão: ${err.message}`,
@@ -702,10 +854,9 @@ export class WppsService implements OnModuleInit {
       );
     }
 
-    const chatId = to.includes('@c.us') ? to : `${to}@c.us`;
-    await client.sendText(chatId, msg);
+    await client.sendText(to, msg);
 
-    return { to: chatId, msg };
+    return { to, msg };
   }
 
   async sendMsgWithImg({
@@ -743,11 +894,7 @@ export class WppsService implements OnModuleInit {
     }
 
     try {
-      const formattedId = contactId.includes('@c.us')
-        ? contactId
-        : `${contactId}@c.us`;
-
-      const contact = await client.getContact(formattedId);
+      const contact = await client.getContact(contactId);
 
       if (!contact) {
         throw new NotFoundException('Contato não encontrado');
@@ -755,7 +902,7 @@ export class WppsService implements OnModuleInit {
 
       let profilePic;
       try {
-        profilePic = await client.getProfilePicFromServer(formattedId);
+        profilePic = await client.getProfilePicFromServer(contactId);
       } catch (e) {}
 
       return {
