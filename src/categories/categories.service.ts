@@ -5,22 +5,22 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-// Bibliotecas
+// Services
 import { PrismaService } from 'src/prisma/prisma.service';
 
-// Dto
-import { CreateBrandDto } from './dto/create-brand.dto';
-import { UpdateBrandDto } from './dto/update-brand.dto';
-import { FindBrandsDto } from './dto/find-brands.dto';
+// Tipagem
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { FindCategoriesDto } from './dto/find-categories.dto';
 import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
-export class BrandsService {
+export class CategoriesService {
   constructor(private readonly client: PrismaService) {}
 
-  async createBrands(data: CreateBrandDto) {
+  async createCategory(data: CreateCategoryDto) {
     try {
-      return await this.client.brands.create({ data });
+      return await this.client.categories.create({ data });
     } catch (err) {
       if (
         err instanceof Prisma.PrismaClientKnownRequestError &&
@@ -32,24 +32,19 @@ export class BrandsService {
     }
   }
 
-  async findAllBrands() {
-    return await this.client.brands.findMany();
-  }
-
-  async findBrands({ pagination, search }: FindBrandsDto) {
+  async findCategories({ search, pagination }: FindCategoriesDto) {
     const { page = 1, limit = 10 } = pagination;
 
     const skip = (page - 1) * limit;
-
     const [data, total] = await Promise.all([
-      this.client.brands.findMany({
+      this.client.categories.findMany({
         skip,
         take: limit,
         where: search
           ? { name: { contains: search, mode: 'insensitive' } }
           : {},
       }),
-      this.client.brands.count(),
+      this.client.categories.count(),
     ]);
 
     return {
@@ -58,17 +53,27 @@ export class BrandsService {
     };
   }
 
-  async findOneBrand(id: string) {
-    const brand = await this.client.brands.findUnique({ where: { id } });
-
-    if (!brand) throw new NotFoundException('Marca não encontrada');
-
-    return brand;
+  async findAllCategories() {
+    return await this.client.categories.findMany();
   }
 
-  async updatBrandse({ id, data }: { id: string; data: UpdateBrandDto }) {
+  async findOneCategories(id: string) {
+    const category = await this.client.categories.findUnique({ where: { id } });
+
+    if (!category) throw new NotFoundException('Categoria não encontrada');
+
+    return category;
+  }
+
+  async updateCategories({
+    id,
+    data,
+  }: {
+    id: string;
+    data: UpdateCategoryDto;
+  }) {
     try {
-      const updated = await this.client.brands.update({
+      const updated = await this.client.categories.update({
         where: { id },
         data,
       });
@@ -79,36 +84,32 @@ export class BrandsService {
         err instanceof Prisma.PrismaClientKnownRequestError &&
         err.code === 'P2025'
       ) {
-        throw new NotFoundException('Marca não encontrada');
+        throw new NotFoundException('Categoria não encontrada');
       }
       throw err;
     }
   }
 
-  async removeBrands(ids: string[]) {
+  async removeCategories(ids: string[]) {
     if (!ids || ids.length === 0) {
       throw new BadRequestException(
         'É necessário fornecer ao menos um ID para deletar',
       );
     }
 
-    const validIds = ids.filter(
-      (id) => id && typeof id === 'string' && id.trim() !== '',
-    );
-
-    if (validIds.length > 100) {
+    if (ids.length > 100) {
       throw new BadRequestException(
         'Não é permitido deletar mais de 100 marcas de uma vez',
       );
     }
 
     try {
-      const deleted = await this.client.brands.deleteMany({
-        where: { id: { in: validIds } },
+      const deleted = await this.client.categories.deleteMany({
+        where: { id: { in: ids } },
       });
 
       if (deleted.count === 0) {
-        throw new NotFoundException('Marca não encontrada');
+        throw new NotFoundException('Categoria não encontrada');
       }
 
       return deleted;
