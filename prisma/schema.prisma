@@ -31,7 +31,8 @@ model Companies {
   updated_at      DateTime? @updatedAt
   company_number  Int
 
-  users Users[] @relation("EnterpriseUsers")
+  users      Users[]      @relation("EnterpriseUsers")
+  warehouses Warehouses[]
 
   @@map("companies")
 }
@@ -54,4 +55,91 @@ model Users {
   enterprise Companies? @relation("EnterpriseUsers", fields: [enterprise_id], references: [id])
 
   @@map("users")
+}
+
+model Brands {
+  id         String    @id @default(uuid())
+  name       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  @@map("brands")
+}
+
+model Categories {
+  id         String     @id @default(uuid())
+  name       String
+  created_at DateTime?  @default(now())
+  updated_at DateTime?  @updatedAt
+  products   Products[]
+
+  @@map("categories")
+}
+
+model Warehouses {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  is_active  Boolean   @default(true)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  company_id String
+  company    Companies @relation(fields: [company_id], references: [id])
+
+  Stocks Stocks[]
+
+  @@map("warehouses")
+}
+
+model Stocks {
+  id                  String    @id @default(uuid())
+  warehouses_id       String
+  current_quantity    Int
+  minimium_quantity   Int
+  maximum_quantity    Int
+  price               Float
+  purchase_price      Float
+  coast_price         Float
+  has_discount        Boolean   @default(false)
+  discount_percentage Float?
+  created_at          DateTime? @default(now())
+  updated_at          DateTime? @updatedAt
+
+  warehouse Warehouses @relation(fields: [warehouses_id], references: [id])
+  products  Products[]
+}
+
+model Products {
+  id                   String    @id @default(uuid())
+  name                 String
+  description          String?
+  stock_id             String
+  category_id          String
+  brand_id             String
+  product_code         String    @unique
+  sales_unit           String
+  is_active            Boolean   @default(true)
+  date_of_inactivation DateTime?
+  created_at           DateTime? @default(now())
+  updated_at           DateTime? @updatedAt
+
+  stock    Stocks     @relation(fields: [stock_id], references: [id], onDelete: Cascade)
+  category Categories @relation(fields: [category_id], references: [id])
+  banners  Banners[]
+
+  @@map("products")
+}
+
+model Banners {
+  id            String    @id @default(uuid())
+  url_imagem    String
+  display_order Int?
+  product_id    String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime? @updatedAt
+
+  product Products? @relation(fields: [product_id], references: [id])
+
+  @@unique([product_id, display_order])
+  @@map("banners")
 }

@@ -17,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
 // Guards
 import { RulesGuard } from './guard/rules/rules.guard';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { BrandsModule } from './brands/brands.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     UsersModule,
     AuthModule,
     forwardRef(() => AuthModule),
+    BrandsModule,
   ],
   controllers: [AppController],
   providers: [AppService, RulesGuard],

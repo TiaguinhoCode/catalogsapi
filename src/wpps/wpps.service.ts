@@ -252,7 +252,6 @@ export class WppsService implements OnModuleInit {
 
     client.onMessage(async (msg) => {
       try {
-        // Busca informações do contato
         let contactName = 'Desconhecido';
         let photo: string | undefined;
 
@@ -264,7 +263,6 @@ export class WppsService implements OnModuleInit {
           console.log('⚠️ Erro ao buscar contato:', e.message);
         }
 
-        // Busca foto do perfil
         try {
           const profilePic = await client.getProfilePicFromServer(msg.from);
           photo = profilePic?.eurl;
@@ -272,11 +270,9 @@ export class WppsService implements OnModuleInit {
           console.log('⚠️ Erro ao buscar foto:', e.message);
         }
 
-        // ✅ Verifica se é uma resposta (quoted message)
         const quoted = (msg as any).quotedMsg;
         let quotedMediaBase64: string | null = null;
 
-        // ✅ Processa mídia da mensagem respondida (se houver)
         if (quoted && ['sticker', 'image'].includes(quoted.type)) {
           try {
             const quotedBuffer = await client.decryptFile(quoted);
@@ -298,7 +294,6 @@ export class WppsService implements OnModuleInit {
                 .toBuffer();
               quotedMediaBase64 = thumbnail.toString('base64');
             }
-            // console.log('✅ Mídia da mensagem respondida processada');
           } catch (e) {
             console.error(
               '❌ Erro ao processar mídia da mensagem respondida:',
@@ -307,7 +302,6 @@ export class WppsService implements OnModuleInit {
           }
         }
 
-        // ✅ Processa mídia da mensagem atual
         let mediaBase64: string | null = null;
         let mimetype: string | undefined;
 
@@ -346,7 +340,6 @@ export class WppsService implements OnModuleInit {
           }
         }
 
-        // ✅ Monta o payload enriquecido
         const messageData = {
           sessionName,
           id: msg.from,
@@ -371,31 +364,11 @@ export class WppsService implements OnModuleInit {
               : null,
           },
         };
-
-        // console.log('📦 Payload enriquecido:', {
-        //   ...messageData,
-        //   lastMessage: {
-        //     ...messageData.lastMessage,
-        //     mediaBase64: mediaBase64
-        //       ? `${mediaBase64.substring(0, 50)}...`
-        //       : null,
-        //     from_msg: messageData.lastMessage.from_msg
-        //       ? {
-        //           ...messageData.lastMessage.from_msg,
-        //           mediaBase64: quotedMediaBase64
-        //             ? `${quotedMediaBase64.substring(0, 50)}...`
-        //             : null,
-        //         }
-        //       : null,
-        //   },
-        // });
-
         this.wppsGateway.emitNewMessage(sessionName, messageData);
         this.eventEmitter.emit('wpp.message', messageData);
       } catch (error) {
         console.error('❌ Erro ao processar mensagem:', error.message);
 
-        // ✅ Fallback: envia payload básico se der erro
         const basicMessageData = {
           id: msg.from,
           sessionName,
