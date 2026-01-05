@@ -19,6 +19,7 @@ import { RulesGuard } from './guard/rules/rules.guard';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BrandsModule } from './brands/brands.module';
 import { CategoriesModule } from './categories/categories.module';
+import { SubcategoriesModule } from './subcategories/subcategories.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CategoriesModule } from './categories/categories.module';
     forwardRef(() => AuthModule),
     BrandsModule,
     CategoriesModule,
+    SubcategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService, RulesGuard],
