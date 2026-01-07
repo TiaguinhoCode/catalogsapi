@@ -103,6 +103,7 @@ model Warehouses {
 model Stocks {
   id                  String    @id @default(uuid())
   warehouses_id       String
+  product_id          String    @unique
   current_quantity    Int
   minimium_quantity   Int
   maximum_quantity    Int
@@ -115,7 +116,7 @@ model Stocks {
   updated_at          DateTime? @updatedAt
 
   warehouse Warehouses @relation(fields: [warehouses_id], references: [id])
-  products  Products[]
+  product   Products   @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 model Products {
@@ -132,7 +133,7 @@ model Products {
   created_at           DateTime? @default(now())
   updated_at           DateTime? @updatedAt
 
-  stock       Stocks        @relation(fields: [stock_id], references: [id], onDelete: Cascade)
+  stock       Stocks?       @relation
   subcategory Subcategories @relation(fields: [subcategory_id], references: [id])
   banners     Banners[]
 
