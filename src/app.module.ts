@@ -20,6 +20,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BrandsModule } from './brands/brands.module';
 import { CategoriesModule } from './categories/categories.module';
 import { SubcategoriesModule } from './subcategories/subcategories.module';
+import { WarehousesModule } from './warehouses/warehouses.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { SubcategoriesModule } from './subcategories/subcategories.module';
     BrandsModule,
     CategoriesModule,
     SubcategoriesModule,
+    WarehousesModule,
   ],
   controllers: [AppController],
   providers: [AppService, RulesGuard],
