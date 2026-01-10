@@ -21,6 +21,7 @@ import { BrandsModule } from './brands/brands.module';
 import { CategoriesModule } from './categories/categories.module';
 import { SubcategoriesModule } from './subcategories/subcategories.module';
 import { WarehousesModule } from './warehouses/warehouses.module';
+import { StocksModule } from './stocks/stocks.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { WarehousesModule } from './warehouses/warehouses.module';
     CategoriesModule,
     SubcategoriesModule,
     WarehousesModule,
+    StocksModule,
   ],
   controllers: [AppController],
   providers: [AppService, RulesGuard],

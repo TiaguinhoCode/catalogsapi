@@ -52,10 +52,11 @@ model Users {
 }
 
 model Brands {
-  id         String    @id @default(uuid())
-  name       String    @unique
-  created_at DateTime? @default(now())
-  updated_at DateTime? @updatedAt
+  id         String     @id @default(uuid())
+  name       String     @unique
+  created_at DateTime?  @default(now())
+  updated_at DateTime?  @updatedAt
+  products   Products[]
 
   @@map("brands")
 }
@@ -67,6 +68,7 @@ model Categories {
   updated_at DateTime? @updatedAt
 
   subcategories Subcategories[]
+  products      Products[]
 
   @@map("categories")
 }
@@ -123,8 +125,9 @@ model Products {
   id                   String    @id @default(uuid())
   name                 String
   description          String?
-  stock_id             String
+  stock_id             String?
   subcategory_id       String
+  category_id          String
   brand_id             String
   product_code         String    @unique
   sales_unit           String
@@ -134,7 +137,9 @@ model Products {
   updated_at           DateTime? @updatedAt
 
   stock       Stocks?       @relation
+  brand       Brands        @relation(fields: [brand_id], references: [id])
   subcategory Subcategories @relation(fields: [subcategory_id], references: [id])
+  category    Categories    @relation(fields: [category_id], references: [id])
   banners     Banners[]
 
   @@map("products")
