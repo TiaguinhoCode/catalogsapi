@@ -22,7 +22,7 @@ import { Roles } from 'src/guard/rules/roles.decorator';
 // Tipagem
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { FindBrandsDto } from 'src/brands/dto/find-brands.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -39,14 +39,14 @@ export class CategoriesController {
   }
 
   @Get()
-  async findCategories(
-    @Query() pagination: PaginationDto,
-    @Query('search') search?: string,
-  ) {
+  async findCategories(@Query() query: FindBrandsDto) {
+    const { page, limit, search } = query;
+
     return {
       msg: 'ok',
       categories: await this.categoriesService.findCategories({
-        pagination,
+        page,
+        limit,
         search,
       }),
     };

@@ -2,9 +2,6 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
-// Tipagem
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
-
 export class FindProductDto {
   @IsOptional()
   @Type(() => Number)
@@ -22,4 +19,8 @@ export class FindProductDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 }

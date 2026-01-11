@@ -22,7 +22,7 @@ import { Roles } from 'src/guard/rules/roles.decorator';
 // Tipagem
 import { CreateSubcategoryDto } from './dto/create-subcategory.dto';
 import { UpdateSubcategoryDto } from './dto/update-subcategory.dto';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { FindSubCategoriesDto } from './dto/find-subcategories.dto';
 
 @Controller('subcategories')
 export class SubcategoriesController {
@@ -47,14 +47,14 @@ export class SubcategoriesController {
   }
 
   @Get('')
-  async findSubcategories(
-    @Query() pagination: PaginationDto,
-    @Query('search') search?: string,
-  ) {
+  async findSubcategories(@Query() query: FindSubCategoriesDto) {
+    const { page, limit, search } = query;
+
     return {
       msg: 'ok',
       subcategories: await this.subcategoriesService.findSubcategories({
-        pagination,
+        page,
+        limit,
         search,
       }),
     };

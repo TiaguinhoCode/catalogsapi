@@ -22,7 +22,6 @@ import { Roles } from 'src/guard/rules/roles.decorator';
 // Tipagem
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
 import { FindProductDto } from './dto/find-product.dto';
 
 @Controller('stocks')
@@ -33,7 +32,6 @@ export class StocksController {
   @UseGuards(AuthGuard, RulesGuard)
   @Roles('Support')
   async createStock(@Body() data: CreateStockDto) {
-    console.log('Dados: ', data);
     const stock = await this.stocksService.createStock(data);
 
     if ('statusCode' in stock) {
@@ -57,11 +55,16 @@ export class StocksController {
   @UseGuards(AuthGuard, RulesGuard)
   @Roles('Support')
   async findStock(@Query() query: FindProductDto) {
-    const { page, limit, search } = query;
+    const { page, limit, search, categoryId } = query;
 
     return {
       msg: 'ok',
-      stocks: await this.stocksService.findStock({ page, limit, search }),
+      stocks: await this.stocksService.findStock({
+        page,
+        limit,
+        search,
+        categoryId,
+      }),
     };
   }
 

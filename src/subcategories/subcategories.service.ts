@@ -51,9 +51,11 @@ export class SubcategoriesService {
     });
   }
 
-  async findSubcategories({ pagination, search }: FindSubCategoriesDto) {
-    const { page = 1, limit = 10 } = pagination;
-
+  async findSubcategories({
+    page = 1,
+    limit = 10,
+    search,
+  }: FindSubCategoriesDto) {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([

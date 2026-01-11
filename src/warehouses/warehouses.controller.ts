@@ -22,7 +22,7 @@ import { Roles } from 'src/guard/rules/roles.decorator';
 // Tipagem
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { FindWarehouseDto } from './dto/find-warehouse.dto';
 
 @Controller('warehouses')
 export class WarehousesController {
@@ -51,22 +51,16 @@ export class WarehousesController {
   @Get()
   @UseGuards(AuthGuard, RulesGuard)
   @Roles('Support')
-  async findWarehouse(
-    @Query() pagination: PaginationDto,
-    @Query('search') search?: string,
-    @Query('isActive') isActive?: string,
-  ) {
+  async findWarehouse(@Query() query: FindWarehouseDto) {
+    const { isActive, limit, page, search } = query;
+
     return {
       msg: 'ok',
       warehouses: await this.warehousesService.findWarehouses({
-        pagination,
+        page,
+        limit,
         search,
-        isActive:
-          isActive?.toLowerCase() === 'true'
-            ? true
-            : isActive?.toLowerCase() === 'false'
-              ? false
-              : undefined,
+        isActive,
       }),
     };
   }

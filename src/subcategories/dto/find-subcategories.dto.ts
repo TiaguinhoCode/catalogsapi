@@ -1,11 +1,20 @@
-// Dto
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
-
 // Nest
-import { IsOptional, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class FindSubCategoriesDto {
-  pagination: PaginationDto;
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 10;
 
   @IsOptional()
   @IsString()

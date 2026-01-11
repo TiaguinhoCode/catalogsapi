@@ -59,9 +59,12 @@ export class WarehousesService {
     });
   }
 
-  async findWarehouses({ pagination, search, isActive }: FindWarehouseDto) {
-    const { page = 1, limit = 10 } = pagination;
-
+  async findWarehouses({
+    page = 1,
+    limit = 10,
+    search,
+    isActive,
+  }: FindWarehouseDto) {
     const skip = (page - 1) * limit;
     const whereClause: any = {};
 
@@ -77,7 +80,7 @@ export class WarehousesService {
     }
 
     if (isActive !== undefined) {
-      whereClause.is_active = isActive;
+      whereClause.is_active = isActive === 'true' ? true : false;
     }
 
     const [data, total] = await Promise.all([

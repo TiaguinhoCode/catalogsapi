@@ -1,17 +1,33 @@
 // Next
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
-
-// Dto
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class FindWarehouseDto {
-  pagination: PaginationDto;
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 10;
 
   @IsOptional()
   @IsString()
   search?: string;
 
-  @IsBoolean()
+  @IsString()
   @IsOptional()
-  isActive?: boolean;
+  isActive?: string;
 }

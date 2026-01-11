@@ -36,9 +36,7 @@ export class BrandsService {
     return await this.client.brands.findMany();
   }
 
-  async findBrands({ pagination, search }: FindBrandsDto) {
-    const { page = 1, limit = 10 } = pagination;
-
+  async findBrands({ page = 1, limit = 10, search }: FindBrandsDto) {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([

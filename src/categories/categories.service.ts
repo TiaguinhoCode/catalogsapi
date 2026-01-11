@@ -32,10 +32,9 @@ export class CategoriesService {
     }
   }
 
-  async findCategories({ search, pagination }: FindCategoriesDto) {
-    const { page = 1, limit = 10 } = pagination;
-
+  async findCategories({ search, page = 1, limit = 10 }: FindCategoriesDto) {
     const skip = (page - 1) * limit;
+
     const [data, total] = await Promise.all([
       this.client.categories.findMany({
         skip,

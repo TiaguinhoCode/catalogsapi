@@ -1,9 +1,7 @@
 // Nest
 import {
   BadRequestException,
-  ConflictException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -158,7 +156,12 @@ export class StocksService {
     });
   }
 
-  async findStock({ page = 1, limit = 10, search }: FindProductDto) {
+  async findStock({
+    page = 1,
+    limit = 10,
+    search,
+    categoryId,
+  }: FindProductDto) {
     const skip = (page - 1) * limit;
 
     const whereClause: Prisma.ProductsWhereInput = search
@@ -167,21 +170,7 @@ export class StocksService {
             { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
 
             {
-              description: {
-                contains: search,
-                mode: Prisma.QueryMode.insensitive,
-              },
-            },
-
-            {
               product_code: {
-                contains: search,
-                mode: Prisma.QueryMode.insensitive,
-              },
-            },
-
-            {
-              sales_unit: {
                 contains: search,
                 mode: Prisma.QueryMode.insensitive,
               },

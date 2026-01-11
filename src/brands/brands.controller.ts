@@ -22,7 +22,7 @@ import { RulesGuard } from 'src/guard/rules/rules.guard';
 // Dto
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
-import { PaginationDto } from 'src/pagination/dto/pagination.dto';
+import { FindBrandsDto } from './dto/find-brands.dto';
 
 @Controller('brands')
 export class BrandsController {
@@ -39,12 +39,12 @@ export class BrandsController {
   }
 
   @Get()
-  async findBrands(
-    @Query() pagination: PaginationDto,
-    @Query('search') search?: string,
-  ) {
+  async findBrands(@Query() query: FindBrandsDto) {
+    const { page, limit, search } = query;
+
     return await this.brandsService.findBrands({
-      pagination,
+      page,
+      limit,
       search,
     });
   }
